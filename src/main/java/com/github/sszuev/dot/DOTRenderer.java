@@ -10,6 +10,7 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.RDFS;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  * Created by @ssz on 09.01.2022.
  */
 public class DOTRenderer {
-    private static final String CLASS_COLOR = "orangered";//"chocolate";
+    private static final String CLASS_COLOR = "orangered";
     private static final String INDIVIDUAL_COLOR = "deeppink";
     private static final String OBJECT_PROPERTY_COLOR = "cyan4";
     private static final String DATA_PROPERTY_COLOR = "forestgreen";
@@ -39,12 +40,31 @@ public class DOTRenderer {
     private final AtomicLong nodeCounter = new AtomicLong();
     private final Map<Node, Long> nodeIds = new HashMap<>();
 
-    private final AtomicLong blankCounter = new AtomicLong();
-    private final Map<Node, Long> blankIds = new HashMap<>();
-
     protected DOTRenderer(PrefixMapping pm, Writer w) {
         this.pm = Objects.requireNonNull(pm);
         this.wr = Objects.requireNonNull(w);
+    }
+
+    /**
+     * Draws the specified {@link OntModel OWL Graph} to the destination represented by {@link Writer}.
+     *
+     * @param model  {@link OntModel}
+     * @param writer {@link Writer}
+     */
+    public static void draw(OntModel model, Writer writer) {
+        new DOTRenderer(model, writer).render(model);
+    }
+
+    /**
+     * Draws the specified {@link OntModel OWL Graph} as a {@code String}.
+     *
+     * @param model {@link OntModel}
+     * @return {@code String}
+     */
+    public static String drawAsString(OntModel model) {
+        StringWriter sw = new StringWriter();
+        draw(model, sw);
+        return sw.toString();
     }
 
     private static String fillColor(String color) {
@@ -100,16 +120,6 @@ public class DOTRenderer {
         }
         sb.append("\t\t</table>");
         return sb.toString();
-    }
-
-    /**
-     * Draws the specified {@link OntModel OWL Graph} to the destination represented by {@link Writer}.
-     *
-     * @param model  {@link OntModel}
-     * @param writer {@link Writer}
-     */
-    public static void draw(OntModel model, Writer writer) {
-        new DOTRenderer(model, writer).render(model);
     }
 
     public void render(OntModel ont) {

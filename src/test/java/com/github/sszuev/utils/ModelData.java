@@ -71,6 +71,7 @@ public enum ModelData {
         }
     },
     ;
+
     private final Path file;
     private final OntFormat format;
     private final String uri;
@@ -233,4 +234,9 @@ public enum ModelData {
     public String getNS() {
         return uri + "#";
     }
+
+    public Path getFile() {
+        return file;
+    }
+
 }
