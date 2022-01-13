@@ -18,18 +18,21 @@ import java.util.stream.Stream;
  */
 class CLI {
     private static final Set<String> HELP_REQUEST = Set.of("/?", "/help", "-help", "--help", "h", "-h", "--h");
+
     private final Path source;
     private final OntFormat format;
     private final Path target;
     private final boolean verbose;
     private final boolean browse;
+    private final boolean asURL;
 
-    CLI(Path source, OntFormat format, Path target, boolean verbose, boolean browse) {
+    CLI(Path source, OntFormat format, Path target, boolean verbose, boolean browse, boolean asURL) {
         this.source = source;
         this.format = format;
         this.target = target;
         this.verbose = verbose;
         this.browse = browse;
+        this.asURL = asURL;
     }
 
     public static CLI parse(String... args) {
@@ -45,9 +48,10 @@ class CLI {
             Path source = parseSource(cmd);
             OntFormat format = parseFormat(cmd);
             Path target = parseTarget(cmd, source);
-            boolean browse = parseBrowse(cmd);
-            boolean verbose = parseVerbose(cmd);
-            return new CLI(source, format, target, verbose, browse);
+            boolean browse = cmd.hasOption("b");
+            boolean verbose = cmd.hasOption("v");
+            boolean asURL = cmd.hasOption("u");
+            return new CLI(source, format, target, verbose, browse, asURL);
         } catch (ParseException e) {
             throw new ExitException(2, e.getMessage(), e);
         } catch (IOException e) {
@@ -73,14 +77,6 @@ class CLI {
         String target = cmd.getOptionValue("o");
         Path res = Paths.get(target);
         return res.isAbsolute() ? res : source.getParent().resolve(res).toAbsolutePath();
-    }
-
-    private static boolean parseBrowse(CommandLine cmd) {
-        return cmd.hasOption("b");
-    }
-
-    private static boolean parseVerbose(CommandLine cmd) {
-        return cmd.hasOption("v");
     }
 
     private static OntFormat get(String key) throws ParseException {
@@ -111,10 +107,15 @@ class CLI {
                         .required(false)
                         .hasArg()
                         .build())
-                .addOptionGroup(buildOutputOption())
                 .addOption(Option.builder("v")
                         .longOpt("verbose")
                         .desc("To print progress messages and logs to console.")
+                        .required(false)
+                        .build())
+                .addOptionGroup(buildOutputOption())
+                .addOption(Option.builder("u")
+                        .longOpt("url")
+                        .desc("Print as url (suitable for small documents).")
                         .required(false)
                         .build());
     }
@@ -156,7 +157,7 @@ class CLI {
     }
 
     private static String cmdLineSyntax() {
-        return "-i <path-to-input-rdf-file> [-if <format>] [-o <output-file-dot>]|[-b][-v]";
+        return "-i <path-to-input-rdf-file> [-if <format>] [-o <output-file-dot>]|[-b][-v][-u]";
     }
 
     private static String availableFormats() {
@@ -181,6 +182,10 @@ class CLI {
 
     public boolean browse() {
         return browse;
+    }
+
+    public boolean printAsURL() {
+        return asURL;
     }
 
     static class ExitException extends RuntimeException {

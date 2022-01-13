@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,8 +46,17 @@ public class App {
             Graphviz.browse(DOTRenderer.drawAsString(ont.asGraphModel()));
         } else {
             LOGGER.info("Write to {}", cli.target());
-            try (Writer writer = openWriter(cli.target())) {
-                DOTRenderer.draw(ont.asGraphModel(), writer);
+            if (cli.printAsURL()) {
+                URI uri = Graphviz.toGraphvizOnlineURI(DOTRenderer.drawAsString(ont.asGraphModel()));
+                if (cli.target() != null) {
+                    Files.writeString(cli.target(), uri.toString(), StandardCharsets.UTF_8);
+                } else {
+                    System.out.println(uri);
+                }
+            } else {
+                try (Writer writer = openWriter(cli.target())) {
+                    DOTRenderer.draw(ont.asGraphModel(), writer);
+                }
             }
         }
         LOGGER.info("Done.");
