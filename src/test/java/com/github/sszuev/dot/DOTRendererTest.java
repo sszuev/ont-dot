@@ -19,7 +19,7 @@ public class DOTRendererTest {
         System.out.println("=".repeat(42));
         String res = DOTRenderer.drawAsString(m);
         System.out.println(res);
-        Assertions.assertTrue(res.contains(";n2->n3;n2->n4;"));
+        Assertions.assertTrue(res.contains("n2->n3;n2->n4;n1->n2"));
     }
 
 }

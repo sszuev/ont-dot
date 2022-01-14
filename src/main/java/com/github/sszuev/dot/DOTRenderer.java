@@ -2,12 +2,10 @@ package com.github.sszuev.dot;
 
 import com.github.owlcs.ontapi.jena.model.*;
 import com.github.owlcs.ontapi.jena.utils.OntModels;
-import com.github.owlcs.ontapi.jena.vocabulary.OWL;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
-import org.apache.jena.vocabulary.RDFS;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -25,7 +23,7 @@ import java.util.stream.Collectors;
  */
 public class DOTRenderer {
     private static final String CLASS_COLOR = "orangered";
-    private static final String INDIVIDUAL_COLOR = "deeppink";
+    private static final String INDIVIDUAL_COLOR = "deeppink"; // darkorchid4 ?
     private static final String OBJECT_PROPERTY_COLOR = "cyan4";
     private static final String DATA_PROPERTY_COLOR = "forestgreen";
     private static final String ANNOTATION_PROPERTY_COLOR = "chartreuse3";
@@ -125,30 +123,71 @@ public class DOTRenderer {
     public void render(OntModel ont) {
         beginDocument();
 
-        ont.classes().forEach(this::writeClass);
-        ont.namedIndividuals().forEach(this::writeIndividual);
-        ont.objectProperties().forEach(this::writeProperty);
-        ont.dataProperties().forEach(this::writeProperty);
-        ont.annotationProperties().forEach(this::writeProperty);
-
-        ont.ontObjects(OntClass.ComponentRestrictionCE.class).forEach(this::writeCE);
-        ont.ontObjects(OntClass.ComponentsCE.class).forEach(this::writeCE);
-        ont.ontObjects(OntClass.ComplementOf.class).forEach(this::writeCE);
-
-        ont.statements(null, RDFS.subClassOf, null).filter(s -> ModelUtils.testStatement(s, OntClass.class))
-                .forEach(s -> writeSubClassOfLink(s.getSubject(), s.getResource()));
-        ont.statements(null, OWL.equivalentClass, null).filter(s -> ModelUtils.testStatement(s, OntClass.class))
-                .forEach(s -> writeEquivalentClassLinks(s.getSubject(), s.getResource()));
-        ont.statements(null, RDFS.subPropertyOf, null).filter(s -> ModelUtils.testStatement(s, OntProperty.class))
-                .forEach(s -> writeSubPropertyOfLinks(s.getSubject(), s.getResource()));
-
-        ont.individuals().forEach(i -> i.classes().forEach(t -> writeIndividualTypeLinks(i, t)));
-
-        ont.ontObjects(OntClass.ComponentRestrictionCE.class).forEach(this::writeCELinks);
-        ont.ontObjects(OntClass.ComponentsCE.class).forEach(this::writeCELinks);
-        ont.ontObjects(OntClass.ComplementOf.class).forEach(this::writeCELinks);
+        ont.classes().forEach(this::renderClass);
+        ont.namedIndividuals().forEach(this::renderIndividual);
+        ont.datatypes().forEach(this::renderDatatype);
+        ont.objectProperties().forEach(this::renderProperty);
+        ont.dataProperties().forEach(this::renderProperty);
+        ont.annotationProperties().forEach(this::renderProperty);
 
         endDocument();
+    }
+
+    protected void renderEntity(OntEntity entity) {
+        if (entity instanceof OntClass.Named) {
+            renderClass((OntClass.Named) entity);
+        } else if (entity instanceof OntDataRange.Named) {
+            renderDatatype((OntDataRange.Named) entity);
+        } else if (entity instanceof OntObjectProperty.Named) {
+            renderProperty((OntObjectProperty.Named) entity);
+        } else if (entity instanceof OntDataProperty) {
+            renderProperty((OntDataProperty) entity);
+        } else if (entity instanceof OntAnnotationProperty) {
+            renderProperty((OntAnnotationProperty) entity);
+        } else if (entity instanceof OntIndividual.Named) {
+            renderIndividual((OntIndividual.Named) entity);
+        }
+    }
+
+    protected void renderClass(OntClass.Named clazz) {
+        writeClass(clazz);
+        clazz.superClasses().forEach(ce -> {
+            renderCE(ce);
+            writeSubClassOfLink(clazz, ce);
+        });
+        clazz.equivalentClasses().forEach(ce -> {
+            renderCE(ce);
+            writeEquivalentClassLinks(clazz, ce);
+        });
+    }
+
+    protected void renderDatatype(OntDataRange.Named dt) {
+        // TODO:
+    }
+
+    protected void renderProperty(OntObjectProperty.Named property) {
+        writeProperty(property);
+        property.superProperties().forEach(s -> writeSubPropertyOfLinks(property, s));
+    }
+
+    protected void renderProperty(OntDataProperty property) {
+        writeProperty(property);
+        property.superProperties().forEach(s -> writeSubPropertyOfLinks(property, s));
+    }
+
+    protected void renderProperty(OntAnnotationProperty property) {
+        writeProperty(property);
+        property.superProperties().forEach(s -> writeSubPropertyOfLinks(property, s));
+    }
+
+    protected void renderIndividual(OntIndividual.Named individual) {
+        writeIndividual(individual);
+        individual.classes().forEach(t -> writeIndividualTypeLinks(individual, t));
+    }
+
+    protected void renderCE(OntClass clazz) {
+        writeCE(clazz);
+        writeCELinks(clazz);
     }
 
     protected void beginDocument() {
@@ -228,6 +267,26 @@ public class DOTRenderer {
 
     private void writeProperty(OntAnnotationProperty uri) {
         printf("n%d[%s, label=<\n%s\n\t>];\n", id(uri), fillColor(ANNOTATION_PROPERTY_COLOR), printTable(uri(uri)));
+    }
+
+    protected void writeCE(OntClass clazz) {
+        if (clazz.canAs(OntClass.ComponentRestrictionCE.class)) {
+            writeCE(clazz.as(OntClass.ComponentRestrictionCE.class));
+        } else if (clazz.canAs(OntClass.ComponentsCE.class)) {
+            writeCE(clazz.as(OntClass.ComponentsCE.class));
+        } else if (clazz.canAs(OntClass.ComplementOf.class)) {
+            writeCE(clazz.as(OntClass.ComplementOf.class));
+        }
+    }
+
+    protected void writeCELinks(OntClass clazz) {
+        if (clazz.canAs(OntClass.ComponentRestrictionCE.class)) {
+            writeCELinks(clazz.as(OntClass.ComponentRestrictionCE.class));
+        } else if (clazz.canAs(OntClass.ComponentsCE.class)) {
+            writeCELinks(clazz.as(OntClass.ComponentsCE.class));
+        } else if (clazz.canAs(OntClass.ComplementOf.class)) {
+            writeCELinks(clazz.as(OntClass.ComplementOf.class));
+        }
     }
 
     private void writeCE(OntClass.ComponentRestrictionCE<?, ?> ce) {
