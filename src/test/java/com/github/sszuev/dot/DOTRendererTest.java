@@ -17,7 +17,7 @@ public class DOTRendererTest {
                 .addSuperClass(m.createDataMaxCardinality(m.getOWLTopDataProperty(), 1, m.getRDFSLiteral()));
         m.write(System.out, "ttl");
         System.out.println("=".repeat(42));
-        String res = DOTRenderer.drawAsString(m);
+        String res = OntVisualizer.create().prefixes(m).draw(m);
         System.out.println(res);
         Assertions.assertTrue(res.contains("n2->n3;n2->n4;n1->n2"));
     }

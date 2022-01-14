@@ -8,7 +8,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -38,31 +37,13 @@ public class DOTRenderer {
     private final AtomicLong nodeCounter = new AtomicLong();
     private final Map<Node, Long> nodeIds = new HashMap<>();
 
-    protected DOTRenderer(PrefixMapping pm, Writer w) {
+    public DOTRenderer(PrefixMapping pm, Writer w) {
         this.pm = Objects.requireNonNull(pm);
         this.wr = Objects.requireNonNull(w);
     }
 
-    /**
-     * Draws the specified {@link OntModel OWL Graph} to the destination represented by {@link Writer}.
-     *
-     * @param model  {@link OntModel}
-     * @param writer {@link Writer}
-     */
-    public static void draw(OntModel model, Writer writer) {
-        new DOTRenderer(model, writer).render(model);
-    }
-
-    /**
-     * Draws the specified {@link OntModel OWL Graph} as a {@code String}.
-     *
-     * @param model {@link OntModel}
-     * @return {@code String}
-     */
-    public static String drawAsString(OntModel model) {
-        StringWriter sw = new StringWriter();
-        draw(model, sw);
-        return sw.toString();
+    public static DOTRenderer create(DOTConfig config, Writer w) {
+        return new DOTRenderer(config.prefixes(), w);
     }
 
     private static String fillColor(String color) {

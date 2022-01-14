@@ -4,7 +4,8 @@ import com.github.owlcs.ontapi.OntFormat;
 import com.github.owlcs.ontapi.OntManagers;
 import com.github.owlcs.ontapi.Ontology;
 import com.github.owlcs.ontapi.OntologyManager;
-import com.github.sszuev.dot.DOTRenderer;
+import com.github.owlcs.ontapi.jena.model.OntModel;
+import com.github.sszuev.dot.OntVisualizer;
 import org.semanticweb.owlapi.io.FileDocumentSource;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -39,15 +40,16 @@ public class App {
         org.apache.log4j.Logger.getRootLogger().setLevel(level);
 
         LOGGER.info("Load ontology from {}", cli.source());
-        Ontology ont = loadOntology(cli.source(), cli.format());
+        OntModel ont = loadOntology(cli.source(), cli.format()).asGraphModel();
 
+        OntVisualizer visualizer = OntVisualizer.create().prefixes(ont);
         if (cli.browse()) {
-            LOGGER.info("Browse");
-            Graphviz.browse(DOTRenderer.drawAsString(ont.asGraphModel()));
+            LOGGER.info("Browse.");
+            Graphviz.browse(visualizer.draw(ont));
         } else {
             LOGGER.info("Write to {}", cli.target());
             if (cli.printAsURL()) {
-                URI uri = Graphviz.toGraphvizOnlineURI(DOTRenderer.drawAsString(ont.asGraphModel()));
+                URI uri = Graphviz.toGraphvizOnlineURI(visualizer.draw(ont));
                 if (cli.target() != null) {
                     Files.writeString(cli.target(), uri.toString(), StandardCharsets.UTF_8);
                 } else {
@@ -55,7 +57,8 @@ public class App {
                 }
             } else {
                 try (Writer writer = openWriter(cli.target())) {
-                    DOTRenderer.draw(ont.asGraphModel(), writer);
+                    visualizer.write(ont, writer);
+                    ;
                 }
             }
         }
