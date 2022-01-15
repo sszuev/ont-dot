@@ -58,9 +58,9 @@ public class WithEntityFilterDOTRenderer extends DOTRenderer {
     }
 
     @Override
-    protected void renderDatatype(OntDataRange.Named dt) {
-        visitedDatatypes.add(dt);
-        super.renderDatatype(dt);
+    protected void renderDatatype(OntDataRange.Named datatype) {
+        visitedDatatypes.add(datatype);
+        super.renderDatatype(datatype);
     }
 
     @Override

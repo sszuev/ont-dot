@@ -6,9 +6,9 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
@@ -20,8 +20,11 @@ import java.util.stream.Collectors;
 /**
  * Created by @ssz on 09.01.2022.
  */
-public class DOTRenderer {
+public class DOTRenderer extends BaseDOTRenderer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DOTRenderer.class);
+
     private static final String CLASS_COLOR = "orangered";
+    private static final String DATATYPE_COLOR = "coral4";
     private static final String INDIVIDUAL_COLOR = "deeppink"; // darkorchid4 ?
     private static final String OBJECT_PROPERTY_COLOR = "cyan4";
     private static final String DATA_PROPERTY_COLOR = "forestgreen";
@@ -31,70 +34,14 @@ public class DOTRenderer {
     private static final String COMPONENTS_CE_COLOR = "yellow2";
     private static final String COMPLEMENT_CE_COLOR = "yellow3";
 
-    protected final Writer wr;
     protected final PrefixMapping pm;
 
     private final AtomicLong nodeCounter = new AtomicLong();
     private final Map<Node, Long> nodeIds = new HashMap<>();
 
-    public DOTRenderer(PrefixMapping pm, Writer w) {
+    public DOTRenderer(PrefixMapping pm, Writer wr) {
+        super(wr);
         this.pm = Objects.requireNonNull(pm);
-        this.wr = Objects.requireNonNull(w);
-    }
-
-    private static String fillColor(String color) {
-        return "style=filled,fillcolor=" + color;
-    }
-
-    private static String color(String color) {
-        return "color=" + color;
-    }
-
-    private static String printTable(String name) {
-        return String.format("\t\t<table border='0' cellborder='1' cellspacing='0'>\n" +
-                "\t\t\t<tr>\n" +
-                "\t\t\t\t<td>%s</td>\n" +
-                "\t\t\t</tr>\n" +
-                "\t\t</table>", name);
-    }
-
-    private static String printTable(String header, String headerColor, String first, String second) {
-        StringBuilder sb = new StringBuilder("\t\t<table border='0' cellborder='1' cellspacing='0'>\n");
-        if (header != null) {
-            sb.append("\t\t\t<th port=\"header\">\n");
-            sb.append("\t\t\t\t<td colspan='2'");
-            if (headerColor != null) {
-                sb.append(" bgcolor=\"").append(headerColor).append("\"");
-            }
-            sb.append(">").append(header).append("</td>\n");
-            sb.append("\t\t\t</th>\n");
-        }
-        sb.append("\t\t\t<tr>\n");
-        sb.append("\t\t\t\t<td>").append(first).append("</td>\n");
-        sb.append("\t\t\t\t<td>").append(second).append("</td>\n");
-        sb.append("\t\t\t</tr>\n");
-        sb.append("\t\t</table>");
-        return sb.toString();
-    }
-
-    private static String printTable(String header, String headerColor, List<String> components) {
-        StringBuilder sb = new StringBuilder("\t\t<table border='0' cellborder='1' cellspacing='0'>\n");
-        if (header != null) {
-            sb.append("\t\t\t<th port=\"header\">\n");
-            sb.append("\t\t\t\t<td");
-            if (headerColor != null) {
-                sb.append(" bgcolor=\"").append(headerColor).append("\"");
-            }
-            sb.append(">").append(header).append("</td>\n");
-            sb.append("\t\t\t</th>\n");
-        }
-        for (String s : components) {
-            sb.append("\t\t\t<tr>\n");
-            sb.append("\t\t\t\t<td>").append(s).append("</td>\n");
-            sb.append("\t\t\t</tr>\n");
-        }
-        sb.append("\t\t</table>");
-        return sb.toString();
     }
 
     public void render(OntModel ont) {
@@ -122,7 +69,8 @@ public class DOTRenderer {
         });
     }
 
-    protected void renderDatatype(OntDataRange.Named dt) {
+    protected void renderDatatype(OntDataRange.Named datatype) {
+        writeDatatype(datatype);
         // TODO:
     }
 
@@ -147,6 +95,9 @@ public class DOTRenderer {
     }
 
     protected void renderCE(OntClass clazz) {
+        if (clazz.isURIResource()) {
+            return;
+        }
         writeCE(clazz);
         writeCELinks(clazz);
     }
@@ -161,38 +112,10 @@ public class DOTRenderer {
         write("\n}\n");
     }
 
-    protected void write(String s) {
-        try {
-            wr.write(s);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    protected void printf(String s, Object... args) {
-        write(String.format(s, args));
-    }
-
     protected void writeLink(RDFNode from, RDFNode to) {
         writeNode(from);
         write("->");
         writeNode(to);
-    }
-
-    protected void beginLinkDetails() {
-        write("[");
-    }
-
-    protected void endLinkDetails() {
-        write("]");
-    }
-
-    protected void writeSemicolon() {
-        write(";");
-    }
-
-    protected void writeComma() {
-        write(",");
     }
 
     protected void writeNode(RDFNode node) {
@@ -212,68 +135,171 @@ public class DOTRenderer {
     }
 
     protected void writeClass(OntClass.Named clazz) {
-        printf("n%d[%s, label=<\n%s\n\t>];\n", id(clazz), fillColor(CLASS_COLOR), printTable(uri(clazz)));
+        writeEntity(clazz, CLASS_COLOR);
+    }
+
+    protected void writeDatatype(OntDataRange.Named datatype) {
+        writeEntity(datatype, DATATYPE_COLOR);
     }
 
     private void writeIndividual(OntIndividual.Named individual) {
-        printf("n%d[%s, label=<\n%s\n\t>];\n", id(individual), fillColor(INDIVIDUAL_COLOR), printTable(uri(individual)));
+        writeEntity(individual, INDIVIDUAL_COLOR);
     }
 
     private void writeProperty(OntObjectProperty.Named property) {
-        printf("n%d[%s, label=<\n%s\n\t>];\n", id(property), fillColor(OBJECT_PROPERTY_COLOR), printTable(uri(property)));
+        writeEntity(property, OBJECT_PROPERTY_COLOR);
     }
 
-    private void writeProperty(OntDataProperty uri) {
-        printf("n%d[%s, label=<\n%s\n\t>];\n", id(uri), fillColor(DATA_PROPERTY_COLOR), printTable(uri(uri)));
+    private void writeProperty(OntDataProperty property) {
+        writeEntity(property, DATA_PROPERTY_COLOR);
     }
 
-    private void writeProperty(OntAnnotationProperty uri) {
-        printf("n%d[%s, label=<\n%s\n\t>];\n", id(uri), fillColor(ANNOTATION_PROPERTY_COLOR), printTable(uri(uri)));
+    private void writeProperty(OntAnnotationProperty property) {
+        writeEntity(property, ANNOTATION_PROPERTY_COLOR);
     }
 
-    protected void writeCE(OntClass clazz) {
-        if (clazz.canAs(OntClass.ComponentRestrictionCE.class)) {
-            writeCE(clazz.as(OntClass.ComponentRestrictionCE.class));
-        } else if (clazz.canAs(OntClass.ComponentsCE.class)) {
-            writeCE(clazz.as(OntClass.ComponentsCE.class));
-        } else if (clazz.canAs(OntClass.ComplementOf.class)) {
-            writeCE(clazz.as(OntClass.ComplementOf.class));
+    protected void writeEntity(OntEntity entity, String color) {
+        writeNode(entity);
+        beginLinkDetails();
+        write("style=filled,fillcolor=");
+        write(color);
+        writeComma();
+        beginDetailsLabel();
+        writeNewLine();
+
+        beginTable(0);
+        beginTag("tr", 1);
+        writeTextCell(uri(entity), 2);
+        endTag("tr", 1);
+        endTable(0);
+
+        endDetailsLabel();
+        writeNewLine();
+        endLinkDetails();
+        writeSemicolon();
+    }
+
+    protected void writeCE(OntClass ce) {
+        String color = supportedExpressionColor(ce);
+        if (color == null) {
+            return;
+        }
+        writeNode(ce);
+        beginLinkDetails();
+        write("color=");
+        write(CLASS_COLOR);
+        writeComma();
+        write("style=filled,fillcolor=");
+        write(color);
+        writeComma();
+        beginDetailsLabel();
+        writeNewLine();
+
+        writeNodeTable(ce, 0);
+
+        endDetailsLabel();
+        writeNewLine();
+        endLinkDetails();
+        writeSemicolon();
+    }
+
+
+    protected void writeNodeTable(RDFNode node, int tab) {
+        if (node.canAs(OntClass.ComponentRestrictionCE.class)) {
+            writeCETable(node.as(OntClass.ComponentRestrictionCE.class), tab);
+        } else if (node.canAs(OntClass.ComponentsCE.class)) {
+            writeCETable(node.as(OntClass.ComponentsCE.class), tab);
+        } else if (node.canAs(OntClass.ComplementOf.class)) {
+            writeCETable(node.as(OntClass.ComplementOf.class), tab);
+        } else {
+            throw new IllegalArgumentException("For node " + node);
         }
     }
 
-    protected void writeCELinks(OntClass clazz) {
-        if (clazz.canAs(OntClass.ComponentRestrictionCE.class)) {
-            writeCELinks(clazz.as(OntClass.ComponentRestrictionCE.class));
-        } else if (clazz.canAs(OntClass.ComponentsCE.class)) {
-            writeCELinks(clazz.as(OntClass.ComponentsCE.class));
-        } else if (clazz.canAs(OntClass.ComplementOf.class)) {
-            writeCELinks(clazz.as(OntClass.ComplementOf.class));
+    protected void writeNodeCell(RDFNode node, int tab) {
+        if (canWriteTable(node)) {
+            beginTag("td", tab);
+            writeNodeTable(node, tab + 1);
+            endTag("td", tab);
+        } else {
+            writeTextCell(rdfNodeToString(node), tab);
         }
     }
 
-    private void writeCE(OntClass.ComponentRestrictionCE<?, ?> ce) {
-        OntRealProperty p = ce.getProperty();
-        RDFNode v = ce.getValue();
-        String header = OntModels.getOntType(ce).getSimpleName();
-        printf("n%d[%s,%s,label=<\n%s\n\t>];\n",
-                id(ce), color(CLASS_COLOR), fillColor(COMPONENT_RESTRICTION_COLOR),
-                printTable(header, CLASS_COLOR, rdfNodeToString(v), rdfNodeToString(p)));
+    protected boolean canWriteTable(RDFNode node) {
+        return node.isAnon() && supportedExpressionColor(node) != null;
     }
 
-    private void writeCE(OntClass.ComplementOf node) {
-        printf("n%d[%s,%s,label=<\n%s\n\t>];\n",
-                id(node), color(CLASS_COLOR), fillColor(COMPLEMENT_CE_COLOR),
-                printTable("ComplementOf(" + rdfNodeToString(node.getValue()) + ")"));
+    protected String supportedExpressionColor(RDFNode clazz) {
+        if (clazz.canAs(OntClass.ComponentRestrictionCE.class)) {
+            return COMPONENT_RESTRICTION_COLOR;
+        }
+        if (clazz.canAs(OntClass.ComponentsCE.class)) {
+            return COMPONENTS_CE_COLOR;
+        }
+        if (clazz.canAs(OntClass.ComplementOf.class)) {
+            return COMPLEMENT_CE_COLOR;
+        }
+        //TODO:
+        LOGGER.error("Unsupported class expression: {}", clazz);
+        return null;
     }
 
-    private void writeCE(OntClass.ComponentsCE<?> ce) {
-        List<String> components = ce.getList().members().map(x -> (RDFNode) x)
-                .map(this::rdfNodeToString)
-                .collect(Collectors.toList());
-        String header = OntModels.getOntType(ce).getSimpleName();
-        printf("n%d[%s,%s,label=<\n%s\n\t>];\n",
-                id(ce), color(CLASS_COLOR), fillColor(COMPONENTS_CE_COLOR),
-                printTable(header, CLASS_COLOR, components));
+    protected void writeCETable(OntClass.ComponentRestrictionCE<?, ?> ce, int tab) {
+        String header = getOntHeader(ce);
+        OntRealProperty first = ce.getProperty();
+        RDFNode second = ce.getValue();
+
+        beginTable(tab);
+        writeNewLine();
+
+        writeTableHeader(tab + 1, header, CLASS_COLOR, 2);
+
+        beginTag("tr", tab + 1);
+        // first cell:
+        writeTextCell(rdfNodeToString(first), tab + 2);
+        // second cell:
+        writeNodeCell(second, tab + 2);
+        endTag("tr", tab + 1);
+
+        endTable(tab);
+    }
+
+    protected void writeCETable(OntClass.ComponentsCE<?> ce, int tab) {
+        String header = getOntHeader(ce);
+
+        beginTable(tab);
+        writeNewLine();
+
+        writeTableHeader(tab + 1, header, CLASS_COLOR, -1);
+
+        ce.getList().members().map(x -> (RDFNode) x).forEach(node -> {
+            beginTag("tr", tab + 1);
+            writeNodeCell(node, tab + 2);
+            endTag("tr", tab + 1);
+        });
+
+        endTable(tab);
+    }
+
+    protected void writeCETable(OntClass.ComplementOf ce, int tab) {
+        String header = getOntHeader(ce);
+        OntClass value = ce.getValue();
+
+        beginTable(tab);
+        writeNewLine();
+
+        writeTableHeader(tab + 1, header, CLASS_COLOR, 2);
+
+        beginTag("tr", tab + 1);
+        writeNodeCell(value, tab + 2);
+        endTag("tr", tab + 1);
+
+        endTable(tab);
+    }
+
+    protected String getOntHeader(OntObject obj) {
+        return OntModels.getOntType(obj).getSimpleName();
     }
 
     private String rdfNodeToString(RDFNode node) {
@@ -334,6 +360,16 @@ public class DOTRenderer {
 
     protected void writeIndividualTypeLinks(OntIndividual i, OntClass t) {
         writeLink(i, t, INDIVIDUAL_COLOR);
+    }
+
+    protected void writeCELinks(OntClass clazz) {
+        if (clazz.canAs(OntClass.ComponentRestrictionCE.class)) {
+            writeCELinks(clazz.as(OntClass.ComponentRestrictionCE.class));
+        } else if (clazz.canAs(OntClass.ComponentsCE.class)) {
+            writeCELinks(clazz.as(OntClass.ComponentsCE.class));
+        } else if (clazz.canAs(OntClass.ComplementOf.class)) {
+            writeCELinks(clazz.as(OntClass.ComplementOf.class));
+        }
     }
 
     protected void writeCELinks(OntClass.ComponentRestrictionCE<?, ?> r) {
