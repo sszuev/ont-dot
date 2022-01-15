@@ -22,7 +22,7 @@ public class WithEntityFilterDOTRendererTest {
                 ":America", "http://www.co-ode.org/ontologies/pizza/pizza.owl#Veneziana");
         String res = writeStr(ont, filter);
         System.out.println(res);
-        Assertions.assertEquals(91, res.split("->").length);
+        Assertions.assertEquals(109, res.split("->").length);
     }
 
     public static String writeStr(OntModel m, Set<String> entities) {

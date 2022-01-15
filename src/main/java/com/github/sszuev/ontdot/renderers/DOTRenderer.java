@@ -25,7 +25,7 @@ public class DOTRenderer extends BaseDOTRenderer {
 
     private static final String CLASS_COLOR = "orangered";
     private static final String DATATYPE_COLOR = "coral4";
-    private static final String INDIVIDUAL_COLOR = "deeppink"; // darkorchid4 ?
+    private static final String INDIVIDUAL_COLOR = "darkorchid4"; // darkorchid4 ?
     private static final String OBJECT_PROPERTY_COLOR = "cyan4";
     private static final String DATA_PROPERTY_COLOR = "forestgreen";
     private static final String ANNOTATION_PROPERTY_COLOR = "chartreuse3";
@@ -98,14 +98,17 @@ public class DOTRenderer extends BaseDOTRenderer {
         if (clazz.isURIResource()) {
             return;
         }
+        if (!supportedExpression(clazz)) {
+            return;
+        }
         writeCE(clazz);
-        writeCELinks(clazz);
+        writeCELinks(null, clazz);
     }
 
     protected void beginDocument() {
         write("digraph OWL {\n" +
-                "    rankdir=\"LR\";\n" +
-                "    node[shape=plaintext];\n");
+                " rankdir=\"LR\";\n" +
+                " node[shape=plaintext];\n");
     }
 
     protected void endDocument() {
@@ -180,7 +183,7 @@ public class DOTRenderer extends BaseDOTRenderer {
     }
 
     protected void writeCE(OntClass ce) {
-        String color = supportedExpressionColor(ce);
+        String color = classExpressionColor(ce);
         if (color == null) {
             return;
         }
@@ -202,7 +205,6 @@ public class DOTRenderer extends BaseDOTRenderer {
         endLinkDetails();
         writeSemicolon();
     }
-
 
     protected void writeNodeTable(RDFNode node, int tab) {
         if (node.canAs(OntClass.ComponentRestrictionCE.class)) {
@@ -227,10 +229,25 @@ public class DOTRenderer extends BaseDOTRenderer {
     }
 
     protected boolean canWriteTable(RDFNode node) {
-        return node.isAnon() && supportedExpressionColor(node) != null;
+        return node.isAnon() && supportedExpression(node);
     }
 
-    protected String supportedExpressionColor(RDFNode clazz) {
+    protected boolean supportedExpression(RDFNode clazz) {
+        if (clazz.canAs(OntClass.ComponentRestrictionCE.class)) {
+            return true;
+        }
+        if (clazz.canAs(OntClass.ComponentsCE.class)) {
+            return true;
+        }
+        if (clazz.canAs(OntClass.ComplementOf.class)) {
+            return true;
+        }
+        //TODO:
+        LOGGER.error("Unsupported class expression: {}", clazz);
+        return false;
+    }
+
+    protected String classExpressionColor(OntClass clazz) {
         if (clazz.canAs(OntClass.ComponentRestrictionCE.class)) {
             return COMPONENT_RESTRICTION_COLOR;
         }
@@ -240,9 +257,7 @@ public class DOTRenderer extends BaseDOTRenderer {
         if (clazz.canAs(OntClass.ComplementOf.class)) {
             return COMPLEMENT_CE_COLOR;
         }
-        //TODO:
-        LOGGER.error("Unsupported class expression: {}", clazz);
-        return null;
+        throw new IllegalStateException("For class " + clazz);
     }
 
     protected void writeCETable(OntClass.ComponentRestrictionCE<?, ?> ce, int tab) {
@@ -362,28 +377,53 @@ public class DOTRenderer extends BaseDOTRenderer {
         writeLink(i, t, INDIVIDUAL_COLOR);
     }
 
-    protected void writeCELinks(OntClass clazz) {
+    protected void writeCELinks(RDFNode from, OntClass clazz) {
         if (clazz.canAs(OntClass.ComponentRestrictionCE.class)) {
-            writeCELinks(clazz.as(OntClass.ComponentRestrictionCE.class));
+            writeCELinks(from, clazz.as(OntClass.ComponentRestrictionCE.class));
         } else if (clazz.canAs(OntClass.ComponentsCE.class)) {
-            writeCELinks(clazz.as(OntClass.ComponentsCE.class));
+            writeCELinks(from, clazz.as(OntClass.ComponentsCE.class));
         } else if (clazz.canAs(OntClass.ComplementOf.class)) {
-            writeCELinks(clazz.as(OntClass.ComplementOf.class));
+            writeCELinks(from, clazz.as(OntClass.ComplementOf.class));
+        } else {
+            throw new IllegalStateException("For class=" + clazz);
         }
     }
 
-    protected void writeCELinks(OntClass.ComponentRestrictionCE<?, ?> r) {
-        RDFNode v = r.getValue();
-        OntRealProperty p = r.getProperty();
-        writeLink(r, v, v.canAs(OntClass.class) ? CLASS_COLOR : null);
-        writeLink(r, p, p.canAs(OntObjectProperty.class) ? OBJECT_PROPERTY_COLOR : null);
+    protected void writeCELinks(RDFNode from, OntClass.ComponentRestrictionCE<?, ?> ce) {
+        if (from == null) {
+            from = ce;
+        }
+        RDFNode v = ce.getValue();
+        if (v.isAnon() && v.canAs(OntClass.class)) {
+            writeCELinks(from, v.as(OntClass.class));
+        } else {
+            writeLink(from, v, v.canAs(OntClass.class) ? CLASS_COLOR : null);
+        }
+
+        OntRealProperty p = ce.getProperty();
+        if (p.isAnon()) {
+            // TODO:
+            LOGGER.error("Not supported {}", p);
+        }
+        writeLink(from, p, p.canAs(OntObjectProperty.class) ? OBJECT_PROPERTY_COLOR : null);
     }
 
-    protected void writeCELinks(OntClass.ComplementOf ce) {
-        writeLink(ce, ce.getValue(), CLASS_COLOR);
+    protected void writeCELinks(RDFNode from, OntClass.ComplementOf ce) {
+        if (from == null) {
+            from = ce;
+        }
+        OntClass v = ce.getValue();
+        if (v.isAnon()) {
+            writeCELinks(from, v);
+        } else {
+            writeLink(from, v, CLASS_COLOR);
+        }
     }
 
-    protected void writeCELinks(OntClass.ComponentsCE<?> ce) {
+    protected void writeCELinks(RDFNode from, OntClass.ComponentsCE<?> ce) {
+        if (from == null) {
+            from = ce;
+        }
         String color = null;
         if (ce.canAs(OntClass.OneOf.class)) {
             color = INDIVIDUAL_COLOR;
@@ -393,7 +433,11 @@ public class DOTRenderer extends BaseDOTRenderer {
         }
         List<RDFNode> members = ce.getList().members().collect(Collectors.toList());
         for (RDFNode m : members) {
-            writeLink(ce, m, color);
+            if (m.isAnon() && m.canAs(OntClass.class)) {
+                writeCELinks(from, m.as(OntClass.class));
+            } else {
+                writeLink(from, m, color);
+            }
         }
     }
 
