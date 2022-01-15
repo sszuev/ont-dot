@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Created by @ssz on 15.01.2022.
  */
-public class WithEntityFilterDOTRenderer extends DOTRenderer {
+public class EntitiesDOTRenderer extends GraphDOTRenderer {
     private final Set<String> filterEntities;
 
     private final Set<OntClass.Named> visitedClasses = new HashSet<>();
@@ -22,7 +22,7 @@ public class WithEntityFilterDOTRenderer extends DOTRenderer {
     private final Set<OntDataProperty> visitedDataProperties = new HashSet<>();
     private final Set<OntAnnotationProperty> visitedAnnotationProperties = new HashSet<>();
 
-    public WithEntityFilterDOTRenderer(PrefixMapping pm, Writer w, Set<String> filterEntities) {
+    public EntitiesDOTRenderer(PrefixMapping pm, Writer w, Set<String> filterEntities) {
         super(pm, w);
         this.filterEntities = Objects.requireNonNull(filterEntities);
     }

@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Created by @ssz on 15.01.2022.
  */
-public class WithEntityFilterDOTRendererTest {
+public class EntitiesDOTRendererTest {
 
     @Test
     public void testFilteredPizza() {
@@ -27,7 +27,7 @@ public class WithEntityFilterDOTRendererTest {
 
     public static String writeStr(OntModel m, Set<String> entities) {
         StringWriter sw = new StringWriter();
-        new WithEntityFilterDOTRenderer(m, sw, entities).render(m);
+        new EntitiesDOTRenderer(m, sw, entities).render(m);
         return sw.toString();
     }
 }

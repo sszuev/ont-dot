@@ -9,10 +9,17 @@ import java.io.Writer;
  */
 public class DOTRendererFactory {
 
-    public static DOTRenderer create(DOTConfig config, Writer w) {
+    /**
+     * Creates a {@link DOTRenderer} to write into specified {@link Writer}.
+     *
+     * @param config {@link DOTConfig}, not {@code null}
+     * @param wr     {@link Writer}
+     * @return {@link DOTRenderer}
+     */
+    public static DOTRenderer create(DOTConfig config, Writer wr) {
         if (config.entities().isEmpty()) {
-            return new DOTRenderer(config.prefixes(), w);
+            return new GraphDOTRenderer(config.prefixes(), wr);
         }
-        return new WithEntityFilterDOTRenderer(config.prefixes(), w, config.entities());
+        return new EntitiesDOTRenderer(config.prefixes(), wr, config.entities());
     }
 }

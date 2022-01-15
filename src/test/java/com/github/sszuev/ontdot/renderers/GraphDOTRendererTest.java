@@ -10,7 +10,7 @@ import java.io.StringWriter;
 /**
  * Created by @ssz on 10.01.2022.
  */
-public class DOTRendererTest {
+public class GraphDOTRendererTest {
 
     @Test
     public void testAccept() {
@@ -53,7 +53,7 @@ public class DOTRendererTest {
 
     public static String writeStr(OntModel m) {
         StringWriter sw = new StringWriter();
-        new DOTRenderer(m, sw).render(m);
+        new GraphDOTRenderer(m, sw).render(m);
         return sw.toString();
     }
 }

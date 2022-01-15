@@ -119,6 +119,4 @@ abstract class BaseDOTRenderer {
         write(node);
         write("</td>\n");
     }
-
-
 }
