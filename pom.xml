@@ -72,7 +72,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.github.sszuev.App</mainClass>
+                                    <mainClass>com.github.sszuev.ontdot.App</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>

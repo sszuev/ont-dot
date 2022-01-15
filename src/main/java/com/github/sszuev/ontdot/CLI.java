@@ -1,4 +1,4 @@
-package com.github.sszuev;
+package com.github.sszuev.ontdot;
 
 import com.github.owlcs.ontapi.OntFormat;
 import org.apache.commons.cli.*;

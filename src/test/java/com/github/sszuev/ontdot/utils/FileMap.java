@@ -1,4 +1,4 @@
-package com.github.sszuev.utils;
+package com.github.sszuev.ontdot.utils;
 
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntologyIRIMapper;

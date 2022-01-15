@@ -1,7 +1,8 @@
-package com.github.sszuev.dot;
+package com.github.sszuev.ontdot.renderers;
 
 import com.github.owlcs.ontapi.jena.model.*;
 import com.github.owlcs.ontapi.jena.utils.OntModels;
+import com.github.sszuev.ontdot.api.DOTConfig;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;

@@ -1,4 +1,4 @@
-package com.github.sszuev.dot;
+package com.github.sszuev.ontdot.api;
 
 import org.apache.jena.shared.PrefixMapping;
 

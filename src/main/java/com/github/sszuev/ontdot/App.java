@@ -1,11 +1,11 @@
-package com.github.sszuev;
+package com.github.sszuev.ontdot;
 
 import com.github.owlcs.ontapi.OntFormat;
 import com.github.owlcs.ontapi.OntManagers;
 import com.github.owlcs.ontapi.Ontology;
 import com.github.owlcs.ontapi.OntologyManager;
 import com.github.owlcs.ontapi.jena.model.OntModel;
-import com.github.sszuev.dot.OntVisualizer;
+import com.github.sszuev.ontdot.api.OntVisualizer;
 import org.semanticweb.owlapi.io.FileDocumentSource;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;

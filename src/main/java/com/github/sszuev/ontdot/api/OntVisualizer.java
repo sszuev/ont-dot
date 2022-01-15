@@ -1,7 +1,8 @@
-package com.github.sszuev.dot;
+package com.github.sszuev.ontdot.api;
 
 import com.github.owlcs.ontapi.jena.OntModelFactory;
 import com.github.owlcs.ontapi.jena.model.OntModel;
+import com.github.sszuev.ontdot.renderers.DOTRenderer;
 import org.apache.jena.shared.PrefixMapping;
 
 import java.io.StringWriter;

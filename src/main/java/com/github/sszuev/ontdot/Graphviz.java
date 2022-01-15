@@ -1,4 +1,4 @@
-package com.github.sszuev;
+package com.github.sszuev.ontdot;
 
 import java.io.IOException;
 import java.net.URI;
