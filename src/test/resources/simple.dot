@@ -1,0 +1,35 @@
+digraph OWL {
+ rankdir="LR";
+ node[shape=plaintext];
+n1[style=filled,fillcolor=orangered,label=<
+<table border='0' cellborder='1' cellspacing='0'> <tr>
+  <td>A</td>
+ </tr>
+</table>
+>
+];n2[color=orangered,style=filled,fillcolor=yellow1,label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <th port="header">
+  <td colspan='3' bgcolor='orangered'>DataMaxCardinality</td>
+ </th>
+ <tr>
+  <td>owl:topDataProperty</td>
+  <td bgcolor='gray'>1^^xsd:nonNegativeInteger</td>
+  <td>rdfs:Literal</td>
+ </tr>
+</table>
+>
+];n2->n3;n2->n4;n3[style=filled,fillcolor=coral4,label=<
+<table border='0' cellborder='1' cellspacing='0'> <tr>
+  <td>rdfs:Literal</td>
+ </tr>
+</table>
+>
+];n4[style=filled,fillcolor=forestgreen,label=<
+<table border='0' cellborder='1' cellspacing='0'> <tr>
+  <td>owl:topDataProperty</td>
+ </tr>
+</table>
+>
+];n1->n2[color=orangered];
+}

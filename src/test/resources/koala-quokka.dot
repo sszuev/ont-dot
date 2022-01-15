@@ -1,0 +1,82 @@
+digraph OWL {
+ rankdir="LR";
+ node[shape=plaintext];
+n1[style=filled,fillcolor=orangered,label=<
+<table border='0' cellborder='1' cellspacing='0'> <tr>
+  <td>:Quokka</td>
+ </tr>
+</table>
+>
+];n2[color=orangered,style=filled,fillcolor=yellow1,label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <th port="header">
+  <td colspan='2' bgcolor='orangered'>DataHasValue</td>
+ </th>
+ <tr>
+  <td>:isHardWorking</td>
+  <td bgcolor='gray'>"true"^^xsd:boolean</td>
+ </tr>
+</table>
+>
+];n2->n3;n3[style=filled,fillcolor=forestgreen,label=<
+<table border='0' cellborder='1' cellspacing='0'> <tr>
+  <td>:isHardWorking</td>
+ </tr>
+</table>
+>
+];n1->n2[color=orangered];n1->n4[color=orangered];n4[style=filled,fillcolor=orangered,label=<
+<table border='0' cellborder='1' cellspacing='0'> <tr>
+  <td>:Marsupials</td>
+ </tr>
+</table>
+>
+];n4->n5[color=orangered];n5[style=filled,fillcolor=orangered,label=<
+<table border='0' cellborder='1' cellspacing='0'> <tr>
+  <td>:Animal</td>
+ </tr>
+</table>
+>
+];n6[color=orangered,style=filled,fillcolor=yellow1,label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <th port="header">
+  <td colspan='3' bgcolor='orangered'>ObjectCardinality</td>
+ </th>
+ <tr>
+  <td>:hasGender</td>
+  <td bgcolor='gray'>1^^xsd:nonNegativeInteger</td>
+  <td>owl:Thing</td>
+ </tr>
+</table>
+>
+];n6->n7[color=orangered];n7[style=filled,fillcolor=orangered,label=<
+<table border='0' cellborder='1' cellspacing='0'> <tr>
+  <td>owl:Thing</td>
+ </tr>
+</table>
+>
+];n6->n8[color=cyan4];n8[style=filled,fillcolor=cyan4,label=<
+<table border='0' cellborder='1' cellspacing='0'> <tr>
+  <td>:hasGender</td>
+ </tr>
+</table>
+>
+];n5->n6[color=orangered];n9[color=orangered,style=filled,fillcolor=yellow1,label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <th port="header">
+  <td colspan='3' bgcolor='orangered'>ObjectMinCardinality</td>
+ </th>
+ <tr>
+  <td>:hasHabitat</td>
+  <td bgcolor='gray'>1^^xsd:nonNegativeInteger</td>
+  <td>owl:Thing</td>
+ </tr>
+</table>
+>
+];n9->n7[color=orangered];n9->n10[color=cyan4];n10[style=filled,fillcolor=cyan4,label=<
+<table border='0' cellborder='1' cellspacing='0'> <tr>
+  <td>:hasHabitat</td>
+ </tr>
+</table>
+>
+];n5->n9[color=orangered];
+}

@@ -2,6 +2,7 @@ package com.github.sszuev.ontdot.renderers;
 
 import com.github.owlcs.ontapi.jena.OntModelFactory;
 import com.github.owlcs.ontapi.jena.model.OntModel;
+import com.github.sszuev.ontdot.utils.ResourceUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -14,41 +15,7 @@ public class GraphDOTRendererTest {
 
     @Test
     public void testAccept() {
-        String expected = "digraph OWL {\n" +
-                " rankdir=\"LR\";\n" +
-                " node[shape=plaintext];\n" +
-                "n1[style=filled,fillcolor=orangered,label=<\n" +
-                "<table border='0' cellborder='1' cellspacing='0'> <tr>\n" +
-                "  <td>A</td>\n" +
-                " </tr>\n" +
-                "</table>\n" +
-                ">\n" +
-                "];n2[color=orangered,style=filled,fillcolor=yellow1,label=<\n" +
-                "<table border='0' cellborder='1' cellspacing='0'>\n" +
-                " <th port=\"header\">\n" +
-                "  <td colspan='3' bgcolor='orangered'>DataMaxCardinality</td>\n" +
-                " </th>\n" +
-                " <tr>\n" +
-                "  <td>owl:topDataProperty</td>\n" +
-                "  <td bgcolor='gray'>1^^xsd:nonNegativeInteger</td>\n" +
-                "  <td>rdfs:Literal</td>\n" +
-                " </tr>\n" +
-                "</table>\n" +
-                ">\n" +
-                "];n2->n3;n2->n4;n3[style=filled,fillcolor=coral4,label=<\n" +
-                "<table border='0' cellborder='1' cellspacing='0'> <tr>\n" +
-                "  <td>rdfs:Literal</td>\n" +
-                " </tr>\n" +
-                "</table>\n" +
-                ">\n" +
-                "];n4[style=filled,fillcolor=forestgreen,label=<\n" +
-                "<table border='0' cellborder='1' cellspacing='0'> <tr>\n" +
-                "  <td>owl:topDataProperty</td>\n" +
-                " </tr>\n" +
-                "</table>\n" +
-                ">\n" +
-                "];n1->n2[color=orangered];\n" +
-                "}\n";
+        String expected = ResourceUtils.getResource("/simple.dot");
 
         OntModel m = OntModelFactory.createModel().setNsPrefixes(OntModelFactory.STANDARD);
         m.createOntClass("A")
