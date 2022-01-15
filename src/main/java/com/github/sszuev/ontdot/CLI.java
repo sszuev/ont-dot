@@ -180,7 +180,7 @@ class CLI {
     }
 
     private static String cmdLineSyntax() {
-        return "-i <path-to-input-rdf-file> [-if <format>] [-o <output-file-dot>]|[-b][-v][-u] [-e filterEntites]";
+        return "-i <path-to-input-rdf-file> [-if <format>] [-o <output-file-dot>]|[-b][-v][-u] [-e filterEntities]";
     }
 
     private static String availableFormats() {

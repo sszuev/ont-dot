@@ -39,12 +39,12 @@ public class App {
         org.apache.log4j.Level level = cli.verbose() ? org.apache.log4j.Level.DEBUG : org.apache.log4j.Level.FATAL;
         org.apache.log4j.Logger.getRootLogger().setLevel(level);
 
-        LOGGER.info("Load ontology from {}", cli.source());
+        LOGGER.info("Load ontology from <{}>", cli.source());
         OntModel ont = loadOntology(cli.source(), cli.format()).asGraphModel();
 
         OntVisualizer visualizer = OntVisualizer.create().prefixes(ont).entities(cli.filterEntities());
         if (cli.browse()) {
-            LOGGER.info("Browse.");
+            LOGGER.info("Browse <{}>", Graphviz.BASE_URL);
             Graphviz.browse(visualizer.draw(ont));
         } else {
             LOGGER.info("Write to {}", cli.target());

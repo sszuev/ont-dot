@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
  */
 public class Graphviz {
 
+    public static final String BASE_URL = "https://dreampuf.github.io/GraphvizOnline/#";
+
     public static void browse(String txt) throws IOException {
         URI uri = toGraphvizOnlineURI(txt);
         // TODO: find shortening service ?
@@ -17,7 +19,7 @@ public class Graphviz {
     }
 
     public static URI toGraphvizOnlineURI(String graph) {
-        return URI.create("https://dreampuf.github.io/GraphvizOnline/#" +
+        return URI.create(BASE_URL +
                 URLEncoder.encode(graph, StandardCharsets.UTF_8).replaceAll("\\+", "%20"));
     }
 }
