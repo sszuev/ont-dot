@@ -109,7 +109,7 @@ abstract class BaseDOTRenderer {
         write(">");
         write(header);
 
-        endTag("td", tab + 1);
+        endTag("td", 0);
         endTag("th", tab);
     }
 

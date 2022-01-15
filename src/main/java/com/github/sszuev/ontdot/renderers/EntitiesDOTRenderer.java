@@ -53,38 +53,44 @@ public class EntitiesDOTRenderer extends GraphDOTRenderer {
 
     @Override
     protected void renderClass(OntClass.Named clazz) {
-        visitedClasses.add(clazz);
-        super.renderClass(clazz);
+        if (visitedClasses.add(clazz)) {
+            super.renderClass(clazz);
+        }
     }
 
     @Override
     protected void renderDatatype(OntDataRange.Named datatype) {
-        visitedDatatypes.add(datatype);
-        super.renderDatatype(datatype);
+        if (visitedDatatypes.add(datatype)) {
+            super.renderDatatype(datatype);
+        }
     }
 
     @Override
     protected void renderProperty(OntObjectProperty.Named property) {
-        visitedObjectProperties.add(property);
-        super.renderProperty(property);
+        if (visitedObjectProperties.add(property)) {
+            super.renderProperty(property);
+        }
     }
 
     @Override
     protected void renderProperty(OntDataProperty property) {
-        visitedDataProperties.add(property);
-        super.renderProperty(property);
+        if (visitedDataProperties.add(property)) {
+            super.renderProperty(property);
+        }
     }
 
     @Override
     protected void renderProperty(OntAnnotationProperty property) {
-        visitedAnnotationProperties.add(property);
-        super.renderProperty(property);
+        if (visitedAnnotationProperties.add(property)) {
+            super.renderProperty(property);
+        }
     }
 
     @Override
     protected void renderIndividual(OntIndividual.Named individual) {
-        visitedIndividuals.add(individual);
-        super.renderIndividual(individual);
+        if (visitedIndividuals.add(individual)) {
+            super.renderIndividual(individual);
+        }
     }
 
     @Override
@@ -114,23 +120,19 @@ public class EntitiesDOTRenderer extends GraphDOTRenderer {
         return filterEntities.contains(su);
     }
 
+    @Override
     protected void renderEntity(OntEntity entity) {
         if (entity instanceof OntClass.Named && !visitedClasses.contains(entity)) {
             renderClass((OntClass.Named) entity);
-        }
-        if (entity instanceof OntDataRange.Named && !visitedDatatypes.contains(entity)) {
+        } else if (entity instanceof OntDataRange.Named && !visitedDatatypes.contains(entity)) {
             renderDatatype((OntDataRange.Named) entity);
-        }
-        if (entity instanceof OntObjectProperty.Named && !visitedObjectProperties.contains(entity)) {
+        } else if (entity instanceof OntObjectProperty.Named && !visitedObjectProperties.contains(entity)) {
             renderProperty((OntObjectProperty.Named) entity);
-        }
-        if (entity instanceof OntDataProperty && !visitedDataProperties.contains(entity)) {
+        } else if (entity instanceof OntDataProperty && !visitedDataProperties.contains(entity)) {
             renderProperty((OntDataProperty) entity);
-        }
-        if (entity instanceof OntAnnotationProperty && !visitedAnnotationProperties.contains(entity)) {
+        } else if (entity instanceof OntAnnotationProperty && !visitedAnnotationProperties.contains(entity)) {
             renderProperty((OntAnnotationProperty) entity);
-        }
-        if (entity instanceof OntIndividual.Named && !visitedIndividuals.contains(entity)) {
+        } else if (entity instanceof OntIndividual.Named && !visitedIndividuals.contains(entity)) {
             renderIndividual((OntIndividual.Named) entity);
         }
     }

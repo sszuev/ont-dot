@@ -14,16 +14,7 @@ public class GraphDOTRendererTest {
 
     @Test
     public void testAccept() {
-        OntModel m = OntModelFactory.createModel().setNsPrefixes(OntModelFactory.STANDARD);
-        m.createOntClass("A")
-                .addSuperClass(m.createDataMaxCardinality(m.getOWLTopDataProperty(), 1, m.getRDFSLiteral()));
-        System.out.println("=".repeat(42));
-        String res = writeStr(m);
-        Assertions.assertTrue(containsLink(res, "n1", "n2"));
-        Assertions.assertTrue(containsLink(res, "n2", "n3"));
-        Assertions.assertTrue(containsLink(res, "n2", "n4"));
-
-        Assertions.assertEquals("digraph OWL {\n" +
+        String expected = "digraph OWL {\n" +
                 " rankdir=\"LR\";\n" +
                 " node[shape=plaintext];\n" +
                 "n1[style=filled,fillcolor=orangered,label=<\n" +
@@ -35,16 +26,40 @@ public class GraphDOTRendererTest {
                 "];n2[color=orangered,style=filled,fillcolor=yellow1,label=<\n" +
                 "<table border='0' cellborder='1' cellspacing='0'>\n" +
                 " <th port=\"header\">\n" +
-                "  <td colspan='2' bgcolor='orangered'>DataMaxCardinality  </td>\n" +
+                "  <td colspan='3' bgcolor='orangered'>DataMaxCardinality</td>\n" +
                 " </th>\n" +
                 " <tr>\n" +
                 "  <td>owl:topDataProperty</td>\n" +
+                "  <td bgcolor='gray'>1^^xsd:nonNegativeInteger</td>\n" +
                 "  <td>rdfs:Literal</td>\n" +
                 " </tr>\n" +
                 "</table>\n" +
                 ">\n" +
-                "];n2->n3;n2->n4;n1->n2[color=orangered];\n" +
-                "}\n", res);
+                "];n2->n3;n2->n4;n3[style=filled,fillcolor=coral4,label=<\n" +
+                "<table border='0' cellborder='1' cellspacing='0'> <tr>\n" +
+                "  <td>rdfs:Literal</td>\n" +
+                " </tr>\n" +
+                "</table>\n" +
+                ">\n" +
+                "];n4[style=filled,fillcolor=forestgreen,label=<\n" +
+                "<table border='0' cellborder='1' cellspacing='0'> <tr>\n" +
+                "  <td>owl:topDataProperty</td>\n" +
+                " </tr>\n" +
+                "</table>\n" +
+                ">\n" +
+                "];n1->n2[color=orangered];\n" +
+                "}\n";
+
+        OntModel m = OntModelFactory.createModel().setNsPrefixes(OntModelFactory.STANDARD);
+        m.createOntClass("A")
+                .addSuperClass(m.createDataMaxCardinality(m.getOWLTopDataProperty(), 1, m.getRDFSLiteral()));
+        System.out.println("=".repeat(42));
+        String res = writeStr(m);
+        Assertions.assertTrue(containsLink(res, "n1", "n2"));
+        Assertions.assertTrue(containsLink(res, "n2", "n3"));
+        Assertions.assertTrue(containsLink(res, "n2", "n4"));
+
+        Assertions.assertEquals(expected, res);
     }
 
     public static boolean containsLink(String dot, String left, String right) {

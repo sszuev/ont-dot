@@ -2,7 +2,9 @@ package com.github.sszuev.ontdot.renderers;
 
 import com.github.owlcs.ontapi.jena.model.*;
 import com.github.owlcs.ontapi.jena.utils.OntModels;
+import com.github.owlcs.ontapi.jena.vocabulary.XSD;
 import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
@@ -29,6 +31,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     private static final String OBJECT_PROPERTY_COLOR = "cyan4";
     private static final String DATA_PROPERTY_COLOR = "forestgreen";
     private static final String ANNOTATION_PROPERTY_COLOR = "chartreuse3";
+    private static final String LITERAL_COLOR = "gray";
 
     private static final String COMPONENT_RESTRICTION_COLOR = "yellow1";
     private static final String COMPONENTS_CE_COLOR = "yellow2";
@@ -56,6 +59,22 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         ont.annotationProperties().forEach(this::renderProperty);
 
         endDocument();
+    }
+
+    protected void renderEntity(OntEntity v) {
+        if (v.canAs(OntClass.class)) {
+            renderClass(v.as(OntClass.Named.class));
+        } else if (v.canAs(OntDataRange.Named.class)) {
+            renderDatatype(v.as(OntDataRange.Named.class));
+        } else if (v.canAs(OntIndividual.Named.class)) {
+            renderIndividual(v.as(OntIndividual.Named.class));
+        } else if (v.canAs(OntObjectProperty.Named.class)) {
+            renderProperty(v.as(OntObjectProperty.Named.class));
+        } else if (v.canAs(OntDataProperty.class)) {
+            renderProperty(v.as(OntDataProperty.class));
+        } else if (v.canAs(OntAnnotationProperty.class)) {
+            renderProperty(v.as(OntAnnotationProperty.class));
+        }
     }
 
     protected void renderClass(OntClass.Named clazz) {
@@ -220,6 +239,10 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     }
 
     protected void writeNodeCell(RDFNode node, int tab) {
+        if (node.isLiteral()) {
+            writeLiteralCell(node.asLiteral(), tab);
+            return;
+        }
         if (canWriteTable(node)) {
             beginTag("td", tab);
             writeNodeTable(node, tab + 1);
@@ -227,6 +250,24 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         } else {
             writeTextCell(rdfNodeToString(node), tab);
         }
+    }
+
+    protected void writeLiteralCell(Literal node, int tab) {
+        beginUnclosedTag("td", tab);
+        write(" bgcolor='");
+        write(LITERAL_COLOR);
+        write("'>");
+        write(ModelUtils.print(node, true, pm));
+        endTag("td", 0);
+    }
+
+    protected void writeLiteralCell(int nonNegativeInt, int tab) {
+        beginUnclosedTag("td", tab);
+        write(" bgcolor='");
+        write(LITERAL_COLOR);
+        write("'>");
+        write(ModelUtils.printLiteral(String.valueOf(nonNegativeInt), false, pm, XSD.nonNegativeInteger.getURI(), null));
+        endTag("td", 0);
     }
 
     protected boolean canWriteTable(RDFNode node) {
@@ -269,12 +310,19 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         beginTable(tab);
         writeNewLine();
 
-        writeTableHeader(tab + 1, header, CLASS_COLOR, 2);
+        writeTableHeader(tab + 1, header, CLASS_COLOR, ce instanceof OntClass.CardinalityRestrictionCE ? 3 : 2);
 
         beginTag("tr", tab + 1);
-        // first cell:
+        // first cell (todo: handle anon object property):
         writeTextCell(rdfNodeToString(first), tab + 2);
-        // second cell:
+
+        // second cell
+        if (ce instanceof OntClass.CardinalityRestrictionCE) {
+            int q = ((OntClass.CardinalityRestrictionCE<?, ?>) ce).getCardinality();
+            writeLiteralCell(q, tab + 2);
+        }
+
+        // last cell:
         writeNodeCell(second, tab + 2);
         endTag("tr", tab + 1);
 
@@ -395,18 +443,37 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
             from = ce;
         }
         RDFNode v = ce.getValue();
-        if (v.isAnon() && v.canAs(OntClass.class)) {
-            writeCELinks(from, v.as(OntClass.class));
-        } else {
-            writeLink(from, v, v.canAs(OntClass.class) ? CLASS_COLOR : null);
+        if (!v.isLiteral()) {
+            if (v.isAnon() && v.canAs(OntClass.class)) {
+                writeCELinks(from, v.as(OntClass.class));
+            } else {
+                writeLink(from, v, v.canAs(OntClass.class) ? CLASS_COLOR : null);
+            }
         }
 
         OntRealProperty p = ce.getProperty();
         if (p.isAnon()) {
-            // TODO:
+            // TODO: handle this case
             LOGGER.error("Not supported {}", p);
         }
         writeLink(from, p, p.canAs(OntObjectProperty.class) ? OBJECT_PROPERTY_COLOR : null);
+
+        renderBuiltinEntity(v);
+        renderBuiltinEntity(p);
+    }
+
+    private void renderBuiltinEntity(RDFNode e) {
+        if (!e.isURIResource()) {
+            return;
+        }
+        renderBuiltinEntity(e.as(OntEntity.class));
+    }
+
+    protected void renderBuiltinEntity(OntEntity e) {
+        if (!e.isBuiltIn() || ModelUtils.isDeclared(e)) {
+            return;
+        }
+        renderEntity(e);
     }
 
     protected void writeCELinks(RDFNode from, OntClass.ComplementOf ce) {
