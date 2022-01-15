@@ -2,7 +2,6 @@ package com.github.sszuev.ontdot.renderers;
 
 import com.github.owlcs.ontapi.jena.model.*;
 import com.github.owlcs.ontapi.jena.utils.OntModels;
-import com.github.sszuev.ontdot.api.DOTConfig;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -32,8 +31,8 @@ public class DOTRenderer {
     private static final String COMPONENTS_CE_COLOR = "yellow2";
     private static final String COMPLEMENT_CE_COLOR = "yellow3";
 
-    private final Writer wr;
-    private final PrefixMapping pm;
+    protected final Writer wr;
+    protected final PrefixMapping pm;
 
     private final AtomicLong nodeCounter = new AtomicLong();
     private final Map<Node, Long> nodeIds = new HashMap<>();
@@ -41,10 +40,6 @@ public class DOTRenderer {
     public DOTRenderer(PrefixMapping pm, Writer w) {
         this.pm = Objects.requireNonNull(pm);
         this.wr = Objects.requireNonNull(w);
-    }
-
-    public static DOTRenderer create(DOTConfig config, Writer w) {
-        return new DOTRenderer(config.prefixes(), w);
     }
 
     private static String fillColor(String color) {
@@ -113,22 +108,6 @@ public class DOTRenderer {
         ont.annotationProperties().forEach(this::renderProperty);
 
         endDocument();
-    }
-
-    protected void renderEntity(OntEntity entity) {
-        if (entity instanceof OntClass.Named) {
-            renderClass((OntClass.Named) entity);
-        } else if (entity instanceof OntDataRange.Named) {
-            renderDatatype((OntDataRange.Named) entity);
-        } else if (entity instanceof OntObjectProperty.Named) {
-            renderProperty((OntObjectProperty.Named) entity);
-        } else if (entity instanceof OntDataProperty) {
-            renderProperty((OntDataProperty) entity);
-        } else if (entity instanceof OntAnnotationProperty) {
-            renderProperty((OntAnnotationProperty) entity);
-        } else if (entity instanceof OntIndividual.Named) {
-            renderIndividual((OntIndividual.Named) entity);
-        }
     }
 
     protected void renderClass(OntClass.Named clazz) {
@@ -229,6 +208,7 @@ public class DOTRenderer {
             endLinkDetails();
         }
         writeSemicolon();
+        renderLinkNodes(to);
     }
 
     protected void writeClass(OntClass.Named clazz) {
@@ -340,8 +320,8 @@ public class DOTRenderer {
         writeLink(sub, sup, color);
     }
 
-    protected void writeEquivalentClassLinks(Resource clazz, Resource eq) {
-        writeLink(clazz, eq);
+    protected void writeEquivalentClassLinks(Resource left, Resource right) {
+        writeLink(left, right);
         beginLinkDetails();
         write("dir=both");
         writeComma();
@@ -349,6 +329,7 @@ public class DOTRenderer {
         write(CLASS_COLOR);
         endLinkDetails();
         writeSemicolon();
+        renderLinkNodes(right);
     }
 
     protected void writeIndividualTypeLinks(OntIndividual i, OntClass t) {
@@ -378,5 +359,8 @@ public class DOTRenderer {
         for (RDFNode m : members) {
             writeLink(ce, m, color);
         }
+    }
+
+    protected void renderLinkNodes(RDFNode... nodes) {
     }
 }

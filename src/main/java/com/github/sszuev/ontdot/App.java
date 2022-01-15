@@ -42,7 +42,7 @@ public class App {
         LOGGER.info("Load ontology from {}", cli.source());
         OntModel ont = loadOntology(cli.source(), cli.format()).asGraphModel();
 
-        OntVisualizer visualizer = OntVisualizer.create().prefixes(ont);
+        OntVisualizer visualizer = OntVisualizer.create().prefixes(ont).entities(cli.filterEntities());
         if (cli.browse()) {
             LOGGER.info("Browse.");
             Graphviz.browse(visualizer.draw(ont));

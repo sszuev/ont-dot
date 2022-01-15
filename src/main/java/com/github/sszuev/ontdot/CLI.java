@@ -9,6 +9,7 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,6 +18,7 @@ import java.util.stream.Stream;
  * Created by @ssz on 12.01.2022.
  */
 class CLI {
+    private static final int DEFAULT_WIDTH = (int) (HelpFormatter.DEFAULT_WIDTH * 1.5);
     private static final Set<String> HELP_REQUEST = Set.of("/?", "/help", "-help", "--help", "h", "-h", "--h");
 
     private final Path source;
@@ -25,14 +27,17 @@ class CLI {
     private final boolean verbose;
     private final boolean browse;
     private final boolean asURL;
+    private final List<String> filterEntities;
 
-    CLI(Path source, OntFormat format, Path target, boolean verbose, boolean browse, boolean asURL) {
+    CLI(Path source, OntFormat format,
+        Path target, boolean verbose, boolean browse, boolean asURL, List<String> filterEntities) {
         this.source = source;
         this.format = format;
         this.target = target;
         this.verbose = verbose;
         this.browse = browse;
         this.asURL = asURL;
+        this.filterEntities = filterEntities;
     }
 
     public static CLI parse(String... args) {
@@ -51,7 +56,8 @@ class CLI {
             boolean browse = cmd.hasOption("b");
             boolean verbose = cmd.hasOption("v");
             boolean asURL = cmd.hasOption("u");
-            return new CLI(source, format, target, verbose, browse, asURL);
+            List<String> entities = parseFilterEntities(cmd);
+            return new CLI(source, format, target, verbose, browse, asURL, entities);
         } catch (ParseException e) {
             throw new ExitException(2, e.getMessage(), e);
         } catch (IOException e) {
@@ -79,6 +85,13 @@ class CLI {
         return res.isAbsolute() ? res : source.getParent().resolve(res).toAbsolutePath();
     }
 
+    private static List<String> parseFilterEntities(CommandLine cmd) {
+        if (!cmd.hasOption("e")) {
+            return List.of();
+        }
+        return Arrays.asList(cmd.getOptionValue("e").split(",\\s*"));
+    }
+
     private static OntFormat get(String key) throws ParseException {
         return OntFormat.formats().filter(f -> aliases(f).anyMatch(x -> x.equalsIgnoreCase(key))).findFirst()
                 .orElseThrow(() -> new ParseException("Unsupported format: '" + key + "'"));
@@ -101,8 +114,9 @@ class CLI {
                         .build())
                 .addOption(Option.builder("if")
                         .longOpt("input-format")
-                        .desc("The input format. " +
-                                "Optional: if not specified the program will choose the most suitable one to load ontology from a file. " +
+                        .desc("The input format. Optional: " +
+                                "if not specified the program will choose the most suitable one " +
+                                "to load ontology from a file. " +
                                 "Must be one of the following: " + availableFormats())
                         .required(false)
                         .hasArg()
@@ -117,7 +131,16 @@ class CLI {
                         .longOpt("url")
                         .desc("Print as url (suitable for small documents).")
                         .required(false)
-                        .build());
+                        .build())
+                .addOption(Option.builder("e")
+                        .longOpt("entities")
+                        .desc("A list of entities to filter, " +
+                                "full or short (prefixed) IRIs, dot as separator, " +
+                                "example for pizza-ontology: '-e :Veneziana,:Germany'")
+                        .required(false)
+                        .hasArg(true)
+                        .build())
+                ;
     }
 
     private static OptionGroup buildOutputOption() {
@@ -150,14 +173,14 @@ class CLI {
         HelpFormatter hf = new HelpFormatter();
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        hf.printHelp(pw, HelpFormatter.DEFAULT_WIDTH * 2, cmdLineSyntax(), null, options,
+        hf.printHelp(pw, DEFAULT_WIDTH, cmdLineSyntax(), null, options,
                 hf.getLeftPadding(), hf.getDescPadding(), null);
         pw.flush();
         return sw.toString();
     }
 
     private static String cmdLineSyntax() {
-        return "-i <path-to-input-rdf-file> [-if <format>] [-o <output-file-dot>]|[-b][-v][-u]";
+        return "-i <path-to-input-rdf-file> [-if <format>] [-o <output-file-dot>]|[-b][-v][-u] [-e filterEntites]";
     }
 
     private static String availableFormats() {
@@ -186,6 +209,10 @@ class CLI {
 
     public boolean printAsURL() {
         return asURL;
+    }
+
+    public List<String> filterEntities() {
+        return filterEntities;
     }
 
     static class ExitException extends RuntimeException {
