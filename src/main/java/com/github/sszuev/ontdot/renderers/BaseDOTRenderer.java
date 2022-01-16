@@ -40,6 +40,12 @@ abstract class BaseDOTRenderer {
         write(",");
     }
 
+    protected void writeDoubleQuotedText(String txt) {
+        write("\"");
+        write(txt);
+        write("\"");
+    }
+
     protected void beginDetailsLabel() {
         write("label=<");
     }
@@ -98,14 +104,12 @@ abstract class BaseDOTRenderer {
 
         beginUnclosedTag("td", tab + 1);
         if (colSpan > 0) {
-            write(" colspan='");
-            write(String.valueOf(colSpan));
-            write("'");
+            write(" colspan=");
+            writeDoubleQuotedText(String.valueOf(colSpan));
         }
         if (headerColor != null) {
-            write(" bgcolor='");
-            write(headerColor);
-            write("'");
+            write(" bgcolor=");
+            writeDoubleQuotedText(headerColor);
         }
         write(">");
         write(header);

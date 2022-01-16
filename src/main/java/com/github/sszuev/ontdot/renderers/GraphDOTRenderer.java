@@ -25,12 +25,12 @@ import java.util.stream.Collectors;
 public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphDOTRenderer.class);
 
-    private static final String CLASS_COLOR = "orangered";
-    private static final String DATATYPE_COLOR = "coral4";
-    private static final String INDIVIDUAL_COLOR = "darkorchid4"; // darkorchid4 ?
-    private static final String OBJECT_PROPERTY_COLOR = "cyan4";
-    private static final String DATA_PROPERTY_COLOR = "forestgreen";
-    private static final String ANNOTATION_PROPERTY_COLOR = "chartreuse3";
+    private static final String CLASS_COLOR = "#CFA500";
+    private static final String DATATYPE_COLOR = "#AD3B45";
+    private static final String INDIVIDUAL_COLOR = "#874B82"; // darkorchid4 ?
+    private static final String OBJECT_PROPERTY_COLOR = "#0079BA";
+    private static final String DATA_PROPERTY_COLOR = "#38A14A";
+    private static final String ANNOTATION_PROPERTY_COLOR = "#D17A00";
     private static final String LITERAL_COLOR = "gray";
 
     private static final String COMPONENT_RESTRICTION_COLOR = "yellow1";
@@ -150,7 +150,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         if (color != null) {
             beginLinkDetails();
             write("color=");
-            write(color);
+            writeDoubleQuotedText(color);
             endLinkDetails();
         }
         writeSemicolon();
@@ -185,7 +185,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         writeNode(entity);
         beginLinkDetails();
         write("style=filled,fillcolor=");
-        write(color);
+        writeDoubleQuotedText(color);
         writeComma();
         beginDetailsLabel();
         writeNewLine();
@@ -210,10 +210,10 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         writeNode(ce);
         beginLinkDetails();
         write("color=");
-        write(CLASS_COLOR);
+        writeDoubleQuotedText(CLASS_COLOR);
         writeComma();
         write("style=filled,fillcolor=");
-        write(color);
+        writeDoubleQuotedText(color);
         writeComma();
         beginDetailsLabel();
         writeNewLine();
@@ -254,18 +254,18 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
 
     protected void writeLiteralCell(Literal node, int tab) {
         beginUnclosedTag("td", tab);
-        write(" bgcolor='");
-        write(LITERAL_COLOR);
-        write("'>");
+        write(" bgcolor=");
+        writeDoubleQuotedText(LITERAL_COLOR);
+        write(">");
         write(ModelUtils.print(node, true, pm));
         endTag("td", 0);
     }
 
     protected void writeLiteralCell(int nonNegativeInt, int tab) {
         beginUnclosedTag("td", tab);
-        write(" bgcolor='");
-        write(LITERAL_COLOR);
-        write("'>");
+        write(" bgcolor=");
+        writeDoubleQuotedText(LITERAL_COLOR);
+        write(">");
         write(ModelUtils.printLiteral(String.valueOf(nonNegativeInt), false, pm, XSD.nonNegativeInteger.getURI(), null));
         endTag("td", 0);
     }
@@ -413,7 +413,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         write("dir=both");
         writeComma();
         write("color=");
-        write(CLASS_COLOR);
+        writeDoubleQuotedText(CLASS_COLOR);
         endLinkDetails();
         writeSemicolon();
         renderLinkNodes(right);

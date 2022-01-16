@@ -1,89 +1,89 @@
 digraph OWL {
  rankdir="LR";
  node[shape=plaintext];
-n1[style=filled,fillcolor=orangered,label=<
+n1[style=filled,fillcolor="#CFA500",label=<
 <table border='0' cellborder='1' cellspacing='0'>
  <tr>
   <td>:Quokka</td>
  </tr>
 </table>
 >
-];n2[color=orangered,style=filled,fillcolor=yellow1,label=<
+];n2[color="#CFA500",style=filled,fillcolor="yellow1",label=<
 <table border='0' cellborder='1' cellspacing='0'>
  <th port="header">
-  <td colspan='2' bgcolor='orangered'>DataHasValue</td>
+  <td colspan="2" bgcolor="#CFA500">DataHasValue</td>
  </th>
  <tr>
   <td>:isHardWorking</td>
-  <td bgcolor='gray'>"true"^^xsd:boolean</td>
+  <td bgcolor="gray">"true"^^xsd:boolean</td>
  </tr>
 </table>
 >
-];n2->n3;n3[style=filled,fillcolor=forestgreen,label=<
+];n2->n3;n3[style=filled,fillcolor="#38A14A",label=<
 <table border='0' cellborder='1' cellspacing='0'>
  <tr>
   <td>:isHardWorking</td>
  </tr>
 </table>
 >
-];n1->n2[color=orangered];n1->n4[color=orangered];n4[style=filled,fillcolor=orangered,label=<
+];n1->n2[color="#CFA500"];n1->n4[color="#CFA500"];n4[style=filled,fillcolor="#CFA500",label=<
 <table border='0' cellborder='1' cellspacing='0'>
  <tr>
   <td>:Marsupials</td>
  </tr>
 </table>
 >
-];n4->n5[color=orangered];n5[style=filled,fillcolor=orangered,label=<
+];n4->n5[color="#CFA500"];n5[style=filled,fillcolor="#CFA500",label=<
 <table border='0' cellborder='1' cellspacing='0'>
  <tr>
   <td>:Animal</td>
  </tr>
 </table>
 >
-];n6[color=orangered,style=filled,fillcolor=yellow1,label=<
+];n6[color="#CFA500",style=filled,fillcolor="yellow1",label=<
 <table border='0' cellborder='1' cellspacing='0'>
  <th port="header">
-  <td colspan='3' bgcolor='orangered'>ObjectCardinality</td>
+  <td colspan="3" bgcolor="#CFA500">ObjectCardinality</td>
  </th>
  <tr>
   <td>:hasGender</td>
-  <td bgcolor='gray'>1^^xsd:nonNegativeInteger</td>
+  <td bgcolor="gray">1^^xsd:nonNegativeInteger</td>
   <td>owl:Thing</td>
  </tr>
 </table>
 >
-];n6->n7[color=orangered];n7[style=filled,fillcolor=orangered,label=<
+];n6->n7[color="#CFA500"];n7[style=filled,fillcolor="#CFA500",label=<
 <table border='0' cellborder='1' cellspacing='0'>
  <tr>
   <td>owl:Thing</td>
  </tr>
 </table>
 >
-];n6->n8[color=cyan4];n8[style=filled,fillcolor=cyan4,label=<
+];n6->n8[color="#0079BA"];n8[style=filled,fillcolor="#0079BA",label=<
 <table border='0' cellborder='1' cellspacing='0'>
  <tr>
   <td>:hasGender</td>
  </tr>
 </table>
 >
-];n5->n6[color=orangered];n9[color=orangered,style=filled,fillcolor=yellow1,label=<
+];n5->n6[color="#CFA500"];n9[color="#CFA500",style=filled,fillcolor="yellow1",label=<
 <table border='0' cellborder='1' cellspacing='0'>
  <th port="header">
-  <td colspan='3' bgcolor='orangered'>ObjectMinCardinality</td>
+  <td colspan="3" bgcolor="#CFA500">ObjectMinCardinality</td>
  </th>
  <tr>
   <td>:hasHabitat</td>
-  <td bgcolor='gray'>1^^xsd:nonNegativeInteger</td>
+  <td bgcolor="gray">1^^xsd:nonNegativeInteger</td>
   <td>owl:Thing</td>
  </tr>
 </table>
 >
-];n9->n7[color=orangered];n9->n10[color=cyan4];n10[style=filled,fillcolor=cyan4,label=<
+];n9->n7[color="#CFA500"];n9->n10[color="#0079BA"];n10[style=filled,fillcolor="#0079BA",label=<
 <table border='0' cellborder='1' cellspacing='0'>
  <tr>
   <td>:hasHabitat</td>
  </tr>
 </table>
 >
-];n5->n9[color=orangered];
+];n5->n9[color="#CFA500"];
 }
