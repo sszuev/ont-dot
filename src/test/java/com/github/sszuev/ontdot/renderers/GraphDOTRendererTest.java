@@ -3,6 +3,8 @@ package com.github.sszuev.ontdot.renderers;
 import com.github.owlcs.ontapi.jena.OntModelFactory;
 import com.github.owlcs.ontapi.jena.model.OntClass;
 import com.github.owlcs.ontapi.jena.model.OntModel;
+import com.github.sszuev.ontdot.api.DOTSetting;
+import com.github.sszuev.ontdot.api.OntVisualizer;
 import com.github.sszuev.ontdot.utils.ResourceUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,7 +24,7 @@ public class GraphDOTRendererTest {
         m.createOntClass("A")
                 .addSuperClass(m.createDataMaxCardinality(m.getOWLTopDataProperty(), 1, m.getRDFSLiteral()));
 
-        String res = writeStr(m, false);
+        String res = writeStr(m, OntVisualizer.create());
         Assertions.assertTrue(containsLink(res, "n1", "n2"));
         Assertions.assertTrue(containsLink(res, "n2", "n3"));
         Assertions.assertTrue(containsLink(res, "n2", "n4"));
@@ -41,7 +43,9 @@ public class GraphDOTRendererTest {
         m.createDataProperty(ns + "ap").addDomain(cl);
         m.createObjectProperty(ns + "op").addDomain(cl);
 
-        String res = writeStr(m, true);
+        String res = writeStr(m, OntVisualizer.create()
+                .withOption(DOTSetting.BOOLEAN_CLASS_PROPERTIES_MAP, true)
+                .withOption(DOTSetting.STRING_CLASS_COLOR, "red"));
         Assertions.assertEquals(expected, res);
     }
 
@@ -49,9 +53,9 @@ public class GraphDOTRendererTest {
         return dot.contains(left + "->" + right);
     }
 
-    public static String writeStr(OntModel m, boolean withClassPropertiesMap) {
+    public static String writeStr(OntModel m, OntVisualizer conf) {
         StringWriter sw = new StringWriter();
-        new GraphDOTRenderer(m, () -> withClassPropertiesMap, sw).render(m);
+        new GraphDOTRenderer(m, conf, sw).render(m);
         return sw.toString();
     }
 }

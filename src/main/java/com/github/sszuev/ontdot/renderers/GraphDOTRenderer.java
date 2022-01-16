@@ -3,6 +3,7 @@ package com.github.sszuev.ontdot.renderers;
 import com.github.owlcs.ontapi.jena.model.*;
 import com.github.owlcs.ontapi.jena.utils.OntModels;
 import com.github.owlcs.ontapi.jena.vocabulary.XSD;
+import com.github.sszuev.ontdot.api.RenderOptions;
 import com.github.sszuev.ontdot.utils.ClassPropertyMapImpl;
 import com.github.sszuev.ontdot.utils.ModelUtils;
 import org.apache.jena.graph.Node;
@@ -28,26 +29,13 @@ import java.util.stream.Collectors;
 public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphDOTRenderer.class);
 
-    private static final String CLASS_COLOR = "#CFA500";
-    private static final String DATATYPE_COLOR = "#AD3B45";
-    private static final String INDIVIDUAL_COLOR = "#874B82"; // darkorchid4 ?
-    private static final String OBJECT_PROPERTY_COLOR = "#0079BA";
-    private static final String DATA_PROPERTY_COLOR = "#38A14A";
-    private static final String ANNOTATION_PROPERTY_COLOR = "#D17A00";
-    private static final String LITERAL_COLOR = "gray";
-    private static final String CLASS_EXPRESSION_COLOR = "#CCCC00";
-
-    private static final String COMPONENT_RESTRICTION_COLOR = "yellow1";
-    private static final String COMPONENTS_CE_COLOR = "yellow2";
-    private static final String COMPLEMENT_CE_COLOR = "yellow3";
-
     protected final PrefixMapping pm;
-    protected final RenderConfig config;
+    protected final RenderOptions config;
 
     private final AtomicLong nodeCounter = new AtomicLong();
     private final Map<Node, Long> nodeIds = new HashMap<>();
 
-    public GraphDOTRenderer(PrefixMapping pm, RenderConfig config, Writer wr) {
+    public GraphDOTRenderer(PrefixMapping pm, RenderOptions config, Writer wr) {
         super(wr);
         this.pm = Objects.requireNonNull(pm);
         this.config = Objects.requireNonNull(config);
@@ -167,7 +155,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         writeNode(clazz);
         beginLinkDetails();
         write("style=filled,fillcolor=");
-        writeDoubleQuotedText(CLASS_COLOR);
+        writeDoubleQuotedText(config.classColor());
         writeComma();
         beginDetailsLabel();
         writeNewLine();
@@ -181,11 +169,11 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         if (config.displayClassPropertiesMap()) {
             List<Property> properties = new ClassPropertyMapImpl().properties(clazz).collect(Collectors.toList());
             properties.stream().filter(x -> x.canAs(OntObjectProperty.Named.class))
-                    .forEach(p -> writeSingleCellRow(uri(p), 1, OBJECT_PROPERTY_COLOR));
+                    .forEach(p -> writeSingleCellRow(uri(p), 1, config.objectPropertyColor()));
             properties.stream().filter(x -> x.canAs(OntDataProperty.class))
-                    .forEach(p -> writeSingleCellRow(uri(p), 1, DATA_PROPERTY_COLOR));
+                    .forEach(p -> writeSingleCellRow(uri(p), 1, config.dataPropertyColor()));
             properties.stream().filter(x -> x.canAs(OntAnnotationProperty.class))
-                    .forEach(p -> writeSingleCellRow(uri(p), 1, ANNOTATION_PROPERTY_COLOR));
+                    .forEach(p -> writeSingleCellRow(uri(p), 1, config.annotationPropertyColor()));
         }
 
         endTable(0);
@@ -197,23 +185,23 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     }
 
     protected void writeDatatype(OntDataRange.Named datatype) {
-        writeEntity(datatype, DATATYPE_COLOR);
+        writeEntity(datatype, config.datatypeColor());
     }
 
     private void writeIndividual(OntIndividual.Named individual) {
-        writeEntity(individual, INDIVIDUAL_COLOR);
+        writeEntity(individual, config.individualColor());
     }
 
     private void writeProperty(OntObjectProperty.Named property) {
-        writeEntity(property, OBJECT_PROPERTY_COLOR);
+        writeEntity(property, config.objectPropertyColor());
     }
 
     private void writeProperty(OntDataProperty property) {
-        writeEntity(property, DATA_PROPERTY_COLOR);
+        writeEntity(property, config.dataPropertyColor());
     }
 
     private void writeProperty(OntAnnotationProperty property) {
-        writeEntity(property, ANNOTATION_PROPERTY_COLOR);
+        writeEntity(property, config.annotationPropertyColor());
     }
 
     protected void writeEntity(OntEntity entity, String color) {
@@ -238,14 +226,14 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     }
 
     protected void writeCE(OntClass ce) {
-        String color = classExpressionFillcolor(ce);
+        String color = ColorHelper.classExpressionFillcolor(config, ce);
         if (color == null) {
             return;
         }
         writeNode(ce);
         beginLinkDetails();
         write("color=");
-        writeDoubleQuotedText(CLASS_EXPRESSION_COLOR);
+        writeDoubleQuotedText(config.classExpressionColor());
         writeComma();
         write("style=filled,fillcolor=");
         writeDoubleQuotedText(color);
@@ -285,7 +273,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         } else {
             String color = null;
             if (node.isURIResource()) {
-                color = entityColor(node.as(OntEntity.class));
+                color = ColorHelper.entityColor(config, node.as(OntEntity.class));
             }
             writeTextCell(rdfNodeToString(node), tab, color);
         }
@@ -294,7 +282,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     protected void writeLiteralCell(Literal node, int tab) {
         beginUnclosedTag("td", tab);
         write(" bgcolor=");
-        writeDoubleQuotedText(LITERAL_COLOR);
+        writeDoubleQuotedText(config.literalColor());
         write(">");
         write(ModelUtils.print(node, true, pm));
         endTag("td", 0);
@@ -303,7 +291,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     protected void writeLiteralCell(int nonNegativeInt, int tab) {
         beginUnclosedTag("td", tab);
         write(" bgcolor=");
-        writeDoubleQuotedText(LITERAL_COLOR);
+        writeDoubleQuotedText(config.literalColor());
         write(">");
         write(ModelUtils.printLiteral(String.valueOf(nonNegativeInt), false, pm, XSD.nonNegativeInteger.getURI(), null));
         endTag("td", 0);
@@ -328,46 +316,6 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         return false;
     }
 
-    protected String classExpressionFillcolor(OntClass clazz) {
-        if (clazz.canAs(OntClass.ComponentRestrictionCE.class)) {
-            return COMPONENT_RESTRICTION_COLOR;
-        }
-        if (clazz.canAs(OntClass.ComponentsCE.class)) {
-            return COMPONENTS_CE_COLOR;
-        }
-        if (clazz.canAs(OntClass.ComplementOf.class)) {
-            return COMPLEMENT_CE_COLOR;
-        }
-        // TODO:
-        throw new IllegalStateException("For class " + clazz);
-    }
-
-    protected String entityColor(OntEntity node) {
-        if (node.canAs(OntClass.Named.class)) {
-            return CLASS_COLOR;
-        }
-        if (node.canAs(OntIndividual.Named.class)) {
-            return INDIVIDUAL_COLOR;
-        }
-        if (node.canAs(OntDataRange.Named.class)) {
-            return DATATYPE_COLOR;
-        }
-        return propertyColor(node.as(OntProperty.class));
-    }
-
-    protected String propertyColor(OntProperty sub) {
-        if (sub.canAs(OntAnnotationProperty.class)) {
-            return ANNOTATION_PROPERTY_COLOR;
-        }
-        if (sub.canAs(OntDataProperty.class)) {
-            return DATA_PROPERTY_COLOR;
-        }
-        if (sub.canAs(OntObjectProperty.class)) {
-            return OBJECT_PROPERTY_COLOR;
-        }
-        throw new IllegalStateException();
-    }
-
     protected void writeCETable(OntClass.ComponentRestrictionCE<?, ?> ce, int tab) {
         String header = getOntHeader(ce);
         OntRealProperty first = ce.getProperty();
@@ -375,12 +323,12 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
 
         beginTable(tab);
 
-        writeTableHeader(tab + 1, header, CLASS_EXPRESSION_COLOR, ce instanceof OntClass.CardinalityRestrictionCE ? 3 : 2);
+        writeTableHeader(tab + 1, header, config.classExpressionColor(), ce instanceof OntClass.CardinalityRestrictionCE ? 3 : 2);
 
         beginTag("tr", tab + 1);
         // first cell (todo: handle anon object property):
         writeTextCell(rdfNodeToString(first), tab + 2,
-                first.canAs(OntDataProperty.class) ? DATA_PROPERTY_COLOR : OBJECT_PROPERTY_COLOR);
+                first.canAs(OntDataProperty.class) ? config.dataPropertyColor() : config.objectPropertyColor());
 
         // second cell
         if (ce instanceof OntClass.CardinalityRestrictionCE) {
@@ -400,7 +348,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
 
         beginTable(tab);
 
-        writeTableHeader(tab + 1, header, CLASS_EXPRESSION_COLOR, -1);
+        writeTableHeader(tab + 1, header, config.classExpressionColor(), -1);
 
         ce.getList().members().map(x -> (RDFNode) x).forEach(node -> {
             beginTag("tr", tab + 1);
@@ -417,7 +365,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
 
         beginTable(tab);
 
-        writeTableHeader(tab + 1, header, CLASS_EXPRESSION_COLOR, 2);
+        writeTableHeader(tab + 1, header, config.classExpressionColor(), 2);
 
         beginTag("tr", tab + 1);
         writeNodeCell(value, tab + 2);
@@ -457,11 +405,11 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     }
 
     protected void writeSubClassOfLink(Resource sub, Resource sup) {
-        writeLink(sub, sup, CLASS_COLOR);
+        writeLink(sub, sup, config.classColor());
     }
 
     protected void writeSubPropertyOfLinks(Resource sub, Resource sup) {
-        String color = sub.canAs(OntProperty.class) ? propertyColor(sub.as(OntProperty.class)) : null;
+        String color = sub.canAs(OntProperty.class) ? ColorHelper.propertyColor(config, sub.as(OntProperty.class)) : null;
         writeLink(sub, sup, color);
     }
 
@@ -471,14 +419,14 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         write("dir=both");
         writeComma();
         write("color=");
-        writeDoubleQuotedText(CLASS_COLOR);
+        writeDoubleQuotedText(config.classColor());
         endLinkDetails();
         writeSemicolon();
         renderLinkNodes(right);
     }
 
     protected void writeIndividualTypeLinks(OntIndividual i, OntClass t) {
-        writeLink(i, t, INDIVIDUAL_COLOR);
+        writeLink(i, t, config.individualColor());
     }
 
     protected void writeCELinks(RDFNode from, OntClass clazz) {
@@ -502,7 +450,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
             if (v.isAnon() && v.canAs(OntClass.class)) {
                 writeCELinks(from, v.as(OntClass.class));
             } else {
-                writeLink(from, v, v.canAs(OntClass.class) ? CLASS_COLOR : null);
+                writeLink(from, v, v.canAs(OntClass.class) ? config.classColor() : null);
             }
         }
 
@@ -511,7 +459,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
             // TODO: handle this case
             LOGGER.error("Not supported {}", p);
         }
-        writeLink(from, p, p.canAs(OntObjectProperty.class) ? OBJECT_PROPERTY_COLOR : null);
+        writeLink(from, p, p.canAs(OntObjectProperty.class) ? config.objectPropertyColor() : null);
 
         renderBuiltinEntity(v);
         renderBuiltinEntity(p);
@@ -539,7 +487,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         if (v.isAnon()) {
             writeCELinks(from, v);
         } else {
-            writeLink(from, v, CLASS_COLOR);
+            writeLink(from, v, config.classColor());
         }
     }
 
@@ -549,10 +497,10 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         }
         String color = null;
         if (ce.canAs(OntClass.OneOf.class)) {
-            color = INDIVIDUAL_COLOR;
+            color = config.individualColor();
         }
         if (color == null && ce.canAs(OntClass.UnionOf.class) || ce.canAs(OntClass.IntersectionOf.class)) {
-            color = CLASS_COLOR;
+            color = config.classColor();
         }
         List<RDFNode> members = ce.getList().members().collect(Collectors.toList());
         for (RDFNode m : members) {

@@ -104,8 +104,13 @@ public class OntVisualizer implements DOTConfig {
     }
 
     @Override
-    public boolean displayClassPropertiesMap() {
-        return getSetting(DOTSetting.BOOLEAN_CLASS_PROPERTIES_MAP);
+    public boolean getBoolean(DOTSetting key) {
+        return getSetting(key);
+    }
+
+    @Override
+    public String getString(DOTSetting key) {
+        return getSetting(key);
     }
 
     @SuppressWarnings({"unchecked", "SameParameterValue"})

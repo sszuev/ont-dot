@@ -1,7 +1,7 @@
 digraph OWL {
  rankdir="LR";
  node[shape=plaintext];
-n1[style=filled,fillcolor="#CFA500",label=<
+n1[style=filled,fillcolor="red",label=<
 <table border='0' cellborder='1' cellspacing='0'>
  <tr>
   <td>x:C</td>

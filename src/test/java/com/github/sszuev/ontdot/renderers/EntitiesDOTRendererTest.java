@@ -3,6 +3,8 @@ package com.github.sszuev.ontdot.renderers;
 import com.github.owlcs.ontapi.OntManagers;
 import com.github.owlcs.ontapi.Ontology;
 import com.github.owlcs.ontapi.jena.model.OntModel;
+import com.github.sszuev.ontdot.api.DOTSetting;
+import com.github.sszuev.ontdot.api.OntVisualizer;
 import com.github.sszuev.ontdot.utils.ModelData;
 import com.github.sszuev.ontdot.utils.ResourceUtils;
 import org.junit.jupiter.api.Assertions;
@@ -37,7 +39,8 @@ public class EntitiesDOTRendererTest {
 
     public static String writeStr(OntModel m, Set<String> entities) {
         StringWriter sw = new StringWriter();
-        new EntitiesDOTRenderer(m, () -> false, entities, sw).render(m);
+        new EntitiesDOTRenderer(m, OntVisualizer.create()
+                .withOption(DOTSetting.BOOLEAN_CLASS_PROPERTIES_MAP, false), entities, sw).render(m);
         return sw.toString();
     }
 }

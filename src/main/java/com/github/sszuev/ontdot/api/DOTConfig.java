@@ -1,6 +1,5 @@
 package com.github.sszuev.ontdot.api;
 
-import com.github.sszuev.ontdot.renderers.RenderConfig;
 import org.apache.jena.shared.PrefixMapping;
 
 import java.util.Set;
@@ -10,7 +9,7 @@ import java.util.Set;
  * <p>
  * Created by @ssz on 14.01.2022.
  */
-public interface DOTConfig extends RenderConfig {
+public interface DOTConfig extends RenderOptions {
 
     /**
      * Returns prefix map for using while rendering.

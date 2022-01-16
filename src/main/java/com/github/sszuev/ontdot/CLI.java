@@ -168,9 +168,10 @@ class CLI {
                         .hasArg(true)
                         .build())
                 .addOption(Option.builder("B")
-                        .hasArgs().valueSeparator('=')
-                        .desc("Set the boolean flag to control rendering, " +
-                                "e.g. '-BclassPropertiesMap=true' will turn on displaying class-properties map")
+                        .numberOfArgs(DOTSetting.values().length).valueSeparator('=')
+                        .desc("To options to control rendering, format is -Bkey=value," +
+                                "e.g. '-BclassPropertiesMap=true' will turn on displaying class-properties map. " +
+                                "Available options: " + availableSettings())
                         .required(false)
                         .build())
                 ;
@@ -218,6 +219,10 @@ class CLI {
 
     private static String availableFormats() {
         return OntFormat.formats().filter(OntFormat::isReadSupported).map(Enum::name).collect(Collectors.joining(", "));
+    }
+
+    private static String availableSettings() {
+        return Arrays.stream(DOTSetting.values()).map(DOTSetting::key).collect(Collectors.joining(", "));
     }
 
     public Path source() {
