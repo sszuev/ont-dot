@@ -8,15 +8,15 @@ n1[style=filled,fillcolor="#CFA500",label=<
  </tr>
 </table>
 >
-];n2[color="#CFA500",style=filled,fillcolor="yellow1",label=<
+];n2[color="#CCCC00",style=filled,fillcolor="yellow1",label=<
 <table border='0' cellborder='1' cellspacing='0'>
  <th port="header">
-  <td colspan="3" bgcolor="#CFA500">DataMaxCardinality</td>
+  <td colspan="3" bgcolor="#CCCC00">DataMaxCardinality</td>
  </th>
  <tr>
-  <td>owl:topDataProperty</td>
+  <td bgcolor="#38A14A">owl:topDataProperty</td>
   <td bgcolor="gray">1^^xsd:nonNegativeInteger</td>
-  <td>rdfs:Literal</td>
+  <td bgcolor="#AD3B45">rdfs:Literal</td>
  </tr>
 </table>
 >
