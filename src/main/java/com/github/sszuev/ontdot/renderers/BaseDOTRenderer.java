@@ -98,7 +98,7 @@ abstract class BaseDOTRenderer {
         writeNewLine();
     }
 
-    protected void writeTableHeader(int tab, String header, String headerColor, int colSpan) {
+    protected void writeTableHeader(int tab, String header, String headerBackgroundColor, int colSpan) {
         writeTab(tab);
         write("<th port=\"header\">\n");
 
@@ -107,9 +107,9 @@ abstract class BaseDOTRenderer {
             write(" colspan=");
             writeDoubleQuotedText(String.valueOf(colSpan));
         }
-        if (headerColor != null) {
+        if (headerBackgroundColor != null) {
             write(" bgcolor=");
-            writeDoubleQuotedText(headerColor);
+            writeDoubleQuotedText(headerBackgroundColor);
         }
         write(">");
         write(header);
@@ -118,10 +118,25 @@ abstract class BaseDOTRenderer {
         endTag("th", tab);
     }
 
-    protected void writeTextCell(String node, int tab) {
+    protected void writeTextCell(String txt, int tab) {
+        writeTextCell(txt, tab, null);
+    }
+
+    protected void writeTextCell(String txt, int tab, String backgroundColor) {
         writeTab(tab);
-        write("<td>");
-        write(node);
+        write("<td");
+        if (backgroundColor != null) {
+            write(" bgcolor=");
+            writeDoubleQuotedText(backgroundColor);
+        }
+        write(">");
+        write(txt);
         write("</td>\n");
+    }
+
+    protected void writeSingleCellRow(String txt, int tab, String backgroundColor) {
+        beginTag("tr", tab);
+        writeTextCell(txt, tab + 1, backgroundColor);
+        endTag("tr", tab);
     }
 }

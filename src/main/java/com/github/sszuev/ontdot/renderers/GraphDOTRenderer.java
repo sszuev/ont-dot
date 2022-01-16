@@ -3,8 +3,11 @@ package com.github.sszuev.ontdot.renderers;
 import com.github.owlcs.ontapi.jena.model.*;
 import com.github.owlcs.ontapi.jena.utils.OntModels;
 import com.github.owlcs.ontapi.jena.vocabulary.XSD;
+import com.github.sszuev.ontdot.utils.ClassPropertyMapImpl;
+import com.github.sszuev.ontdot.utils.ModelUtils;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
@@ -38,13 +41,15 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     private static final String COMPLEMENT_CE_COLOR = "yellow3";
 
     protected final PrefixMapping pm;
+    protected final RenderConfig config;
 
     private final AtomicLong nodeCounter = new AtomicLong();
     private final Map<Node, Long> nodeIds = new HashMap<>();
 
-    public GraphDOTRenderer(PrefixMapping pm, Writer wr) {
+    public GraphDOTRenderer(PrefixMapping pm, RenderConfig config, Writer wr) {
         super(wr);
         this.pm = Objects.requireNonNull(pm);
+        this.config = Objects.requireNonNull(config);
     }
 
     @Override
@@ -158,7 +163,36 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     }
 
     protected void writeClass(OntClass.Named clazz) {
-        writeEntity(clazz, CLASS_COLOR);
+        writeNode(clazz);
+        beginLinkDetails();
+        write("style=filled,fillcolor=");
+        writeDoubleQuotedText(CLASS_COLOR);
+        writeComma();
+        beginDetailsLabel();
+        writeNewLine();
+
+        beginTable(0);
+
+        beginTag("tr", 1);
+        writeTextCell(uri(clazz), 2);
+        endTag("tr", 1);
+
+        if (config.displayClassPropertiesMap()) {
+            List<Property> properties = new ClassPropertyMapImpl().properties(clazz).collect(Collectors.toList());
+            properties.stream().filter(x -> x.canAs(OntObjectProperty.Named.class))
+                    .forEach(p -> writeSingleCellRow(uri(p), 1, OBJECT_PROPERTY_COLOR));
+            properties.stream().filter(x -> x.canAs(OntDataProperty.class))
+                    .forEach(p -> writeSingleCellRow(uri(p), 1, DATA_PROPERTY_COLOR));
+            properties.stream().filter(x -> x.canAs(OntAnnotationProperty.class))
+                    .forEach(p -> writeSingleCellRow(uri(p), 1, ANNOTATION_PROPERTY_COLOR));
+        }
+
+        endTable(0);
+
+        endDetailsLabel();
+        writeNewLine();
+        endLinkDetails();
+        writeSemicolon();
     }
 
     protected void writeDatatype(OntDataRange.Named datatype) {

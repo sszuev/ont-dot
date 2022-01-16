@@ -1,6 +1,7 @@
 package com.github.sszuev.ontdot;
 
 import com.github.owlcs.ontapi.OntFormat;
+import com.github.sszuev.ontdot.api.DOTSettings;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,9 +30,11 @@ class CLI {
     private final boolean browse;
     private final boolean asURL;
     private final List<String> filterEntities;
+    private final Set<DOTSettings> optionsToEnable;
 
     CLI(Path source, OntFormat format,
-        Path target, boolean verbose, boolean browse, boolean asURL, List<String> filterEntities) {
+        Path target, boolean verbose, boolean browse, boolean asURL,
+        List<String> filterEntities, Set<DOTSettings> optionsToEnable) {
         this.source = source;
         this.format = format;
         this.target = target;
@@ -38,6 +42,7 @@ class CLI {
         this.browse = browse;
         this.asURL = asURL;
         this.filterEntities = filterEntities;
+        this.optionsToEnable = optionsToEnable;
     }
 
     public static CLI parse(String... args) {
@@ -57,7 +62,8 @@ class CLI {
             boolean verbose = cmd.hasOption("v");
             boolean asURL = cmd.hasOption("u");
             List<String> entities = parseFilterEntities(cmd);
-            return new CLI(source, format, target, verbose, browse, asURL, entities);
+            Set<DOTSettings> settings = parseOptions(cmd);
+            return new CLI(source, format, target, verbose, browse, asURL, entities, settings);
         } catch (ParseException e) {
             throw new ExitException(2, e.getMessage(), e);
         } catch (IOException e) {
@@ -90,6 +96,33 @@ class CLI {
             return List.of();
         }
         return Arrays.asList(cmd.getOptionValue("e").split(",\\s*"));
+    }
+
+    private static Set<DOTSettings> parseOptions(CommandLine cmd) throws ParseException {
+        if (!cmd.hasOption("D")) {
+            return Set.of();
+        }
+        Set<DOTSettings> res = EnumSet.noneOf(DOTSettings.class);
+        String[] opts = cmd.getOptionValues("D");
+        if (opts.length % 2 != 0) {
+            throw new ParseException("Wrong options :" + Arrays.toString(opts));
+        }
+        for (int i = 0; i < opts.length; i += 2) {
+            DOTSettings key = parseKey(opts[i]);
+            if (Boolean.parseBoolean(opts[i + 1])) {
+                res.add(key);
+            }
+        }
+        return res;
+    }
+
+    private static DOTSettings parseKey(String op) throws ParseException {
+        for (DOTSettings s : DOTSettings.values()) {
+            if (s.name().replace("_", "").equalsIgnoreCase(op)) {
+                return s;
+            }
+        }
+        throw new ParseException("Unknown option: " + op);
     }
 
     private static OntFormat get(String key) throws ParseException {
@@ -140,6 +173,12 @@ class CLI {
                         .required(false)
                         .hasArg(true)
                         .build())
+                .addOption(Option.builder("D")
+                        .hasArgs().valueSeparator('=')
+                        .desc("Set the boolean flag to control rendering, " +
+                                "e.g. '-DclassPropertiesMap=true' will turn on displaying class-properties map")
+                        .required(false)
+                        .build())
                 ;
     }
 
@@ -180,7 +219,7 @@ class CLI {
     }
 
     private static String cmdLineSyntax() {
-        return "-i <path-to-input-rdf-file> [-if <format>] [-o <output-file-dot>]|[-b][-v][-u] [-e filterEntities]";
+        return "-i <path-to-input-rdf-file> [-if <format>] [-o <output-file-dot>]|[-b][-v][-u] [-e filterEntities][-Doption=...]";
     }
 
     private static String availableFormats() {
@@ -213,6 +252,10 @@ class CLI {
 
     public List<String> filterEntities() {
         return filterEntities;
+    }
+
+    public Set<DOTSettings> options() {
+        return optionsToEnable;
     }
 
     static class ExitException extends RuntimeException {

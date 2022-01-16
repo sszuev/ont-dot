@@ -37,7 +37,7 @@ public class EntitiesDOTRendererTest {
 
     public static String writeStr(OntModel m, Set<String> entities) {
         StringWriter sw = new StringWriter();
-        new EntitiesDOTRenderer(m, sw, entities).render(m);
+        new EntitiesDOTRenderer(m, () -> false, entities, sw).render(m);
         return sw.toString();
     }
 }

@@ -18,8 +18,8 @@ public class DOTRendererFactory {
      */
     public static DOTRenderer create(DOTConfig config, Writer wr) {
         if (config.entities().isEmpty()) {
-            return new GraphDOTRenderer(config.prefixes(), wr);
+            return new GraphDOTRenderer(config.prefixes(), config, wr);
         }
-        return new EntitiesDOTRenderer(config.prefixes(), wr, config.entities());
+        return new EntitiesDOTRenderer(config.prefixes(), config, config.entities(), wr);
     }
 }

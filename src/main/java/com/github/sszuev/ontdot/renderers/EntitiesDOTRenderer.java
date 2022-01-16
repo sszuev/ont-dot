@@ -22,8 +22,8 @@ public class EntitiesDOTRenderer extends GraphDOTRenderer {
     private final Set<OntDataProperty> visitedDataProperties = new HashSet<>();
     private final Set<OntAnnotationProperty> visitedAnnotationProperties = new HashSet<>();
 
-    public EntitiesDOTRenderer(PrefixMapping pm, Writer w, Set<String> filterEntities) {
-        super(pm, w);
+    public EntitiesDOTRenderer(PrefixMapping pm, RenderConfig config, Set<String> filterEntities, Writer wr) {
+        super(pm, config, wr);
         this.filterEntities = Objects.requireNonNull(filterEntities);
     }
 

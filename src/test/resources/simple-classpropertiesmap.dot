@@ -1,0 +1,45 @@
+digraph OWL {
+ rankdir="LR";
+ node[shape=plaintext];
+n1[style=filled,fillcolor="#CFA500",label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <tr>
+  <td>x:C</td>
+ </tr>
+ <tr>
+  <td bgcolor="#0079BA">x:op</td>
+ </tr>
+ <tr>
+  <td bgcolor="#38A14A">x:ap</td>
+ </tr>
+ <tr>
+  <td bgcolor="#D17A00">rdfs:label</td>
+ </tr>
+ <tr>
+  <td bgcolor="#D17A00">x:ap</td>
+ </tr>
+</table>
+>
+];n2[style=filled,fillcolor="#0079BA",label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <tr>
+  <td>x:op</td>
+ </tr>
+</table>
+>
+];n3[style=filled,fillcolor="#38A14A",label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <tr>
+  <td>x:ap</td>
+ </tr>
+</table>
+>
+];n3[style=filled,fillcolor="#D17A00",label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <tr>
+  <td>x:ap</td>
+ </tr>
+</table>
+>
+];
+}
