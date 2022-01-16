@@ -308,7 +308,6 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         RDFNode second = ce.getValue();
 
         beginTable(tab);
-        writeNewLine();
 
         writeTableHeader(tab + 1, header, CLASS_COLOR, ce instanceof OntClass.CardinalityRestrictionCE ? 3 : 2);
 
@@ -333,7 +332,6 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         String header = getOntHeader(ce);
 
         beginTable(tab);
-        writeNewLine();
 
         writeTableHeader(tab + 1, header, CLASS_COLOR, -1);
 
@@ -351,7 +349,6 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         OntClass value = ce.getValue();
 
         beginTable(tab);
-        writeNewLine();
 
         writeTableHeader(tab + 1, header, CLASS_COLOR, 2);
 

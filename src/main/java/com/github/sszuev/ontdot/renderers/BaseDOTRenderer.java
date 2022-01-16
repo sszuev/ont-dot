@@ -65,6 +65,7 @@ abstract class BaseDOTRenderer {
     protected void beginTable(int tab) {
         writeTab(tab);
         write("<table border='0' cellborder='1' cellspacing='0'>");
+        writeNewLine();
     }
 
     protected void endTable(int tab) {
