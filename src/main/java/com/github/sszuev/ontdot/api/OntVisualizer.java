@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 public class OntVisualizer implements DOTConfig {
     private final PrefixMapping pm;
     private final Set<String> entities;
-    private final Map<DOTSettings, Object> settings;
+    private final Map<DOTSetting, Object> settings;
 
-    protected OntVisualizer(PrefixMapping pm, Set<String> entities, Map<DOTSettings, Object> settings) {
+    protected OntVisualizer(PrefixMapping pm, Set<String> entities, Map<DOTSetting, Object> settings) {
         this.pm = Objects.requireNonNull(pm);
         this.entities = Objects.requireNonNull(entities);
         this.settings = Objects.requireNonNull(settings);
@@ -33,7 +33,7 @@ public class OntVisualizer implements DOTConfig {
         return of(OntModelFactory.STANDARD, Set.of(), Map.of());
     }
 
-    protected static OntVisualizer of(PrefixMapping pm, Set<String> entities, Map<DOTSettings, Object> settings) {
+    protected static OntVisualizer of(PrefixMapping pm, Set<String> entities, Map<DOTSetting, Object> settings) {
         return new OntVisualizer(pm, entities, settings);
     }
 
@@ -47,10 +47,22 @@ public class OntVisualizer implements DOTConfig {
     }
 
     @SuppressWarnings("SameParameterValue")
-    protected static Map<DOTSettings, Object> copy(Map<DOTSettings, Object> map, DOTSettings key, Object value) {
-        EnumMap<DOTSettings, Object> res = new EnumMap<>(DOTSettings.class);
+    protected static Map<DOTSetting, Object> addOption(Map<DOTSetting, Object> map, DOTSetting key, Object value) {
+        EnumMap<DOTSetting, Object> res = new EnumMap<>(DOTSetting.class);
         res.putAll(map);
         res.put(key, value);
+        return Collections.unmodifiableMap(res);
+    }
+
+    protected static Map<DOTSetting, Object> addOptions(Map<DOTSetting, Object> map, Map<DOTSetting, Object> other) {
+        EnumMap<DOTSetting, Object> res = new EnumMap<>(DOTSetting.class);
+        res.putAll(map);
+        other.forEach((k, v) -> {
+            if (!k.type().isInstance(v)) {
+                throw new IllegalArgumentException("Wrong type: " + v);
+            }
+            res.put(k, v);
+        });
         return Collections.unmodifiableMap(res);
     }
 
@@ -62,8 +74,23 @@ public class OntVisualizer implements DOTConfig {
         return of(this.pm, copy(entities), this.settings);
     }
 
-    public OntVisualizer witOption(DOTSettings key, boolean value) {
-        return of(this.pm, this.entities, copy(this.settings, key, value));
+
+    public OntVisualizer withOptions(Map<DOTSetting, Object> settings) {
+        return of(this.pm, this.entities, addOptions(this.settings, settings));
+    }
+
+    public OntVisualizer withOption(DOTSetting key, boolean value) {
+        if (Boolean.class != key.type) {
+            throw new IllegalArgumentException("Wrong key: " + key);
+        }
+        return of(this.pm, this.entities, addOption(this.settings, key, value));
+    }
+
+    public OntVisualizer withOption(DOTSetting key, String value) {
+        if (String.class != key.type) {
+            throw new IllegalArgumentException("Wrong key: " + key);
+        }
+        return of(this.pm, this.entities, addOption(this.settings, key, value));
     }
 
     @Override
@@ -78,11 +105,11 @@ public class OntVisualizer implements DOTConfig {
 
     @Override
     public boolean displayClassPropertiesMap() {
-        return getSetting(DOTSettings.CLASS_PROPERTIES_MAP);
+        return getSetting(DOTSetting.BOOLEAN_CLASS_PROPERTIES_MAP);
     }
 
     @SuppressWarnings({"unchecked", "SameParameterValue"})
-    protected <X> X getSetting(DOTSettings key) {
+    protected <X> X getSetting(DOTSetting key) {
         return (X) settings.getOrDefault(key, key.defaultValue);
     }
 

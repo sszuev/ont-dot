@@ -1,7 +1,7 @@
 package com.github.sszuev.ontdot;
 
 import com.github.owlcs.ontapi.OntFormat;
-import com.github.sszuev.ontdot.api.DOTSettings;
+import com.github.sszuev.ontdot.api.DOTSetting;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
@@ -9,10 +9,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -30,11 +27,11 @@ class CLI {
     private final boolean browse;
     private final boolean asURL;
     private final List<String> filterEntities;
-    private final Set<DOTSettings> optionsToEnable;
+    private final Map<DOTSetting, Object> optionsToEnable;
 
     CLI(Path source, OntFormat format,
         Path target, boolean verbose, boolean browse, boolean asURL,
-        List<String> filterEntities, Set<DOTSettings> optionsToEnable) {
+        List<String> filterEntities, Map<DOTSetting, Object> optionsToEnable) {
         this.source = source;
         this.format = format;
         this.target = target;
@@ -62,7 +59,7 @@ class CLI {
             boolean verbose = cmd.hasOption("v");
             boolean asURL = cmd.hasOption("u");
             List<String> entities = parseFilterEntities(cmd);
-            Set<DOTSettings> settings = parseOptions(cmd);
+            Map<DOTSetting, Object> settings = parseOptions(cmd);
             return new CLI(source, format, target, verbose, browse, asURL, entities, settings);
         } catch (ParseException e) {
             throw new ExitException(2, e.getMessage(), e);
@@ -98,31 +95,28 @@ class CLI {
         return Arrays.asList(cmd.getOptionValue("e").split(",\\s*"));
     }
 
-    private static Set<DOTSettings> parseOptions(CommandLine cmd) throws ParseException {
-        if (!cmd.hasOption("D")) {
-            return Set.of();
+    private static Map<DOTSetting, Object> parseOptions(CommandLine cmd) throws ParseException {
+        if (!cmd.hasOption("B")) {
+            return Map.of();
         }
-        Set<DOTSettings> res = EnumSet.noneOf(DOTSettings.class);
-        String[] opts = cmd.getOptionValues("D");
+        Map<DOTSetting, Object> res = new EnumMap<>(DOTSetting.class);
+        String[] opts = cmd.getOptionValues("B");
         if (opts.length % 2 != 0) {
             throw new ParseException("Wrong options :" + Arrays.toString(opts));
         }
         for (int i = 0; i < opts.length; i += 2) {
-            DOTSettings key = parseKey(opts[i]);
-            if (Boolean.parseBoolean(opts[i + 1])) {
-                res.add(key);
+            DOTSetting key = DOTSetting.ofKey(opts[i]);
+            if (key == null) {
+                throw new ParseException("Unknown option: " + opts[i]);
+            }
+            String value = opts[i + 1];
+            if (key.type() == Boolean.class) {
+                res.put(key, Boolean.parseBoolean(value));
+            } else {
+                res.put(key, value);
             }
         }
         return res;
-    }
-
-    private static DOTSettings parseKey(String op) throws ParseException {
-        for (DOTSettings s : DOTSettings.values()) {
-            if (s.name().replace("_", "").equalsIgnoreCase(op)) {
-                return s;
-            }
-        }
-        throw new ParseException("Unknown option: " + op);
     }
 
     private static OntFormat get(String key) throws ParseException {
@@ -173,10 +167,10 @@ class CLI {
                         .required(false)
                         .hasArg(true)
                         .build())
-                .addOption(Option.builder("D")
+                .addOption(Option.builder("B")
                         .hasArgs().valueSeparator('=')
                         .desc("Set the boolean flag to control rendering, " +
-                                "e.g. '-DclassPropertiesMap=true' will turn on displaying class-properties map")
+                                "e.g. '-BclassPropertiesMap=true' will turn on displaying class-properties map")
                         .required(false)
                         .build())
                 ;
@@ -219,7 +213,7 @@ class CLI {
     }
 
     private static String cmdLineSyntax() {
-        return "-i <path-to-input-rdf-file> [-if <format>] [-o <output-file-dot>]|[-b][-v][-u] [-e filterEntities][-Doption=...]";
+        return "-i <path-to-input-rdf-file> [-if <format>] [-o <output-file-dot>]|[-b][-v][-u] [-e filterEntities][-Boption-key=option-value]";
     }
 
     private static String availableFormats() {
@@ -254,7 +248,7 @@ class CLI {
         return filterEntities;
     }
 
-    public Set<DOTSettings> options() {
+    public Map<DOTSetting, Object> options() {
         return optionsToEnable;
     }
 

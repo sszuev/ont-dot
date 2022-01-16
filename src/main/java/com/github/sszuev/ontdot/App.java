@@ -5,7 +5,6 @@ import com.github.owlcs.ontapi.OntManagers;
 import com.github.owlcs.ontapi.Ontology;
 import com.github.owlcs.ontapi.OntologyManager;
 import com.github.owlcs.ontapi.jena.model.OntModel;
-import com.github.sszuev.ontdot.api.DOTSettings;
 import com.github.sszuev.ontdot.api.OntVisualizer;
 import org.semanticweb.owlapi.io.FileDocumentSource;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
@@ -43,10 +42,9 @@ public class App {
         LOGGER.info("Load ontology from <{}>", cli.source());
         OntModel ont = loadOntology(cli.source(), cli.format()).asGraphModel();
 
-        OntVisualizer visualizer = OntVisualizer.create().prefixes(ont).entities(cli.filterEntities());
-        for (DOTSettings option : cli.options()) {
-            visualizer = visualizer.witOption(option, true);
-        }
+        OntVisualizer visualizer = OntVisualizer.create().prefixes(ont)
+                .entities(cli.filterEntities()).withOptions(cli.options());
+
         if (cli.browse()) {
             LOGGER.info("Browse <{}>", Graphviz.BASE_URL);
             Graphviz.browse(visualizer.draw(ont));
@@ -62,7 +60,6 @@ public class App {
             } else {
                 try (Writer writer = openWriter(cli.target())) {
                     visualizer.write(ont, writer);
-                    ;
                 }
             }
         }
