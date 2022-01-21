@@ -6,10 +6,12 @@ import com.github.owlcs.ontapi.jena.model.OntModel;
 import com.github.sszuev.ontdot.api.DOTSetting;
 import com.github.sszuev.ontdot.api.OntVisualizer;
 import com.github.sszuev.ontdot.utils.ResourceUtils;
+import org.apache.jena.rdf.model.Property;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.StringWriter;
+import java.util.List;
 
 /**
  * Created by @ssz on 10.01.2022.
@@ -33,8 +35,8 @@ public class GraphDOTRendererTest {
     }
 
     @Test
-    public void testSimpleClassPropertiesMap() {
-        String expected = ResourceUtils.getResource("/simple-classpropertiesmap.dot");
+    public void testDefaultClassPropertiesMap() {
+        String expected = ResourceUtils.getResource("/simple-default-cpm.dot");
 
         String ns = "http://x#";
         OntModel m = OntModelFactory.createModel().setNsPrefixes(OntModelFactory.STANDARD).setNsPrefix("x", ns);
@@ -49,13 +51,31 @@ public class GraphDOTRendererTest {
         Assertions.assertEquals(expected, res);
     }
 
+    @Test
+    public void testCustomClassPropertiesMap() {
+        String expected = ResourceUtils.getResource("/simple-custom-cpm.dot");
+
+        String ns = "http://x#";
+        OntModel m = OntModelFactory.createModel().setNsPrefixes(OntModelFactory.STANDARD).setNsPrefix("my", ns);
+        m.createOntClass(ns + "SubClass").addSubClassOfStatement(m.createOntClass(ns + "SuperClass"));
+
+        List<Property> builtins = List.of(m.getOWLTopObjectProperty(), m.getOWLTopDataProperty(),
+                m.getRDFSComment(), m.getRDFSLabel());
+
+        String res = writeStr(m, OntVisualizer.create()
+                .withClassProperties(ce -> builtins.stream())
+                .withOption(DOTSetting.STRING_CLASS_COLOR, "green"));
+
+        Assertions.assertEquals(expected, res);
+    }
+
     public static boolean containsLink(String dot, String left, String right) {
         return dot.contains(left + "->" + right);
     }
 
     public static String writeStr(OntModel m, OntVisualizer conf) {
         StringWriter sw = new StringWriter();
-        new GraphDOTRenderer(m, conf, sw).render(m);
+        new GraphDOTRenderer(m, conf.classProperties(), conf, sw).render(m);
         return sw.toString();
     }
 }

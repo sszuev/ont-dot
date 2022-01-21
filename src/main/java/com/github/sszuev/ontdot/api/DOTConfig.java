@@ -26,4 +26,10 @@ public interface DOTConfig extends RenderOptions {
      */
     Set<String> entities();
 
+    /**
+     * Returns a class-properties mapping.
+     *
+     * @return {@link ClassPropertyMap}
+     */
+    ClassPropertyMap classProperties();
 }

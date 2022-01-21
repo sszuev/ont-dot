@@ -3,8 +3,8 @@ package com.github.sszuev.ontdot.renderers;
 import com.github.owlcs.ontapi.jena.model.*;
 import com.github.owlcs.ontapi.jena.utils.OntModels;
 import com.github.owlcs.ontapi.jena.vocabulary.XSD;
+import com.github.sszuev.ontdot.api.ClassPropertyMap;
 import com.github.sszuev.ontdot.api.RenderOptions;
-import com.github.sszuev.ontdot.utils.ClassPropertyMapImpl;
 import com.github.sszuev.ontdot.utils.ModelUtils;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Literal;
@@ -31,14 +31,16 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
 
     protected final PrefixMapping pm;
     protected final RenderOptions config;
+    protected final ClassPropertyMap classProperties;
 
     private final AtomicLong nodeCounter = new AtomicLong();
     private final Map<Node, Long> nodeIds = new HashMap<>();
 
-    public GraphDOTRenderer(PrefixMapping pm, RenderOptions config, Writer wr) {
+    public GraphDOTRenderer(PrefixMapping pm, ClassPropertyMap cpm, RenderOptions options, Writer wr) {
         super(wr);
         this.pm = Objects.requireNonNull(pm);
-        this.config = Objects.requireNonNull(config);
+        this.classProperties = Objects.requireNonNull(cpm);
+        this.config = Objects.requireNonNull(options);
     }
 
     @Override
@@ -152,22 +154,14 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     }
 
     protected void writeClass(OntClass.Named clazz) {
-        writeNode(clazz);
-        beginLinkDetails();
-        write("style=filled,fillcolor=");
-        writeDoubleQuotedText(config.classColor());
-        writeComma();
-        beginDetailsLabel();
-        writeNewLine();
-
-        beginTable(0);
+        beginEntityTable(clazz, config.classColor());
 
         beginTag("tr", 1);
         writeTextCell(uri(clazz), 2);
         endTag("tr", 1);
 
         if (config.displayClassPropertiesMap()) {
-            List<Property> properties = new ClassPropertyMapImpl().properties(clazz).collect(Collectors.toList());
+            List<Property> properties = classProperties.properties(clazz).collect(Collectors.toList());
             properties.stream().filter(x -> x.canAs(OntObjectProperty.Named.class))
                     .forEach(p -> writeSingleCellRow(uri(p), 1, config.objectPropertyColor()));
             properties.stream().filter(x -> x.canAs(OntDataProperty.class))
@@ -176,12 +170,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
                     .forEach(p -> writeSingleCellRow(uri(p), 1, config.annotationPropertyColor()));
         }
 
-        endTable(0);
-
-        endDetailsLabel();
-        writeNewLine();
-        endLinkDetails();
-        writeSemicolon();
+        endEntityTable();
     }
 
     protected void writeDatatype(OntDataRange.Named datatype) {
@@ -205,6 +194,16 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     }
 
     protected void writeEntity(OntEntity entity, String color) {
+        beginEntityTable(entity, color);
+
+        beginTag("tr", 1);
+        writeTextCell(uri(entity), 2);
+        endTag("tr", 1);
+
+        endEntityTable();
+    }
+
+    protected void beginEntityTable(OntEntity entity, String color) {
         writeNode(entity);
         beginLinkDetails();
         write("style=filled,fillcolor=");
@@ -212,13 +211,11 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         writeComma();
         beginDetailsLabel();
         writeNewLine();
-
         beginTable(0);
-        beginTag("tr", 1);
-        writeTextCell(uri(entity), 2);
-        endTag("tr", 1);
-        endTable(0);
+    }
 
+    protected void endEntityTable() {
+        endTable(0);
         endDetailsLabel();
         writeNewLine();
         endLinkDetails();

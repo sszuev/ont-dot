@@ -3,6 +3,7 @@ package com.github.sszuev.ontdot.api;
 import com.github.owlcs.ontapi.jena.OntModelFactory;
 import com.github.owlcs.ontapi.jena.model.OntModel;
 import com.github.sszuev.ontdot.renderers.DOTRendererFactory;
+import com.github.sszuev.ontdot.utils.ClassPropertyMapImpl;
 import org.apache.jena.shared.PrefixMapping;
 
 import java.io.StringWriter;
@@ -22,19 +23,29 @@ public class OntVisualizer implements DOTConfig {
     private final PrefixMapping pm;
     private final Set<String> entities;
     private final Map<DOTSetting, Object> settings;
+    private final ClassPropertyMap classProperties;
 
-    protected OntVisualizer(PrefixMapping pm, Set<String> entities, Map<DOTSetting, Object> settings) {
+    protected OntVisualizer(PrefixMapping pm, ClassPropertyMap cpm, Map<DOTSetting, Object> conf, Set<String> entities) {
         this.pm = Objects.requireNonNull(pm);
         this.entities = Objects.requireNonNull(entities);
-        this.settings = Objects.requireNonNull(settings);
+        this.settings = Objects.requireNonNull(conf);
+        this.classProperties = Objects.requireNonNull(cpm);
     }
 
+    /**
+     * Creates a visualizer with the default configuration.
+     *
+     * @return {@link OntVisualizer}
+     */
     public static OntVisualizer create() {
-        return of(OntModelFactory.STANDARD, Set.of(), Map.of());
+        return of(OntModelFactory.STANDARD, new ClassPropertyMapImpl(), Set.of(), Map.of());
     }
 
-    protected static OntVisualizer of(PrefixMapping pm, Set<String> entities, Map<DOTSetting, Object> settings) {
-        return new OntVisualizer(pm, entities, settings);
+    protected static OntVisualizer of(PrefixMapping pm,
+                                      ClassPropertyMap cpm,
+                                      Set<String> entities,
+                                      Map<DOTSetting, Object> settings) {
+        return new OntVisualizer(pm, cpm, settings, entities);
     }
 
     protected static Set<String> copy(Collection<String> entities) {
@@ -66,31 +77,74 @@ public class OntVisualizer implements DOTConfig {
         return Collections.unmodifiableMap(res);
     }
 
+    /**
+     * Sets prefix mapping.
+     *
+     * @param pm {@link PrefixMapping}, not {@code null}
+     * @return a copied instance of {@link OntVisualizer} with new settings
+     */
     public OntVisualizer prefixes(PrefixMapping pm) {
-        return of(copy(pm), this.entities, this.settings);
+        return of(copy(pm), this.classProperties, this.entities, this.settings);
     }
 
+    /**
+     * Sets entities to filter.
+     *
+     * @param entities a {@code Collection} of {@code String} - short (prefixed) or full (iri) names
+     * @return a copied instance of {@link OntVisualizer} with new settings
+     */
     public OntVisualizer entities(Collection<String> entities) {
-        return of(this.pm, copy(entities), this.settings);
+        return of(this.pm, this.classProperties, copy(entities), this.settings);
     }
 
+    /**
+     * Sets the specified class-properties mapping and turns on the corresponding property setting.
+     *
+     * @param cpm {@link ClassPropertyMap}, not {@code null}
+     * @return a copied instance of {@link OntVisualizer} with new settings
+     * @see DOTSetting#BOOLEAN_CLASS_PROPERTIES_MAP
+     */
+    public OntVisualizer withClassProperties(ClassPropertyMap cpm) {
+        return of(this.pm, Objects.requireNonNull(cpm), this.entities,
+                addOption(this.settings, DOTSetting.BOOLEAN_CLASS_PROPERTIES_MAP, true));
+    }
 
+    /**
+     * Sets options.
+     *
+     * @param settings a {@code Map} of new settings
+     * @return a copied instance of {@link OntVisualizer} with new settings
+     */
     public OntVisualizer withOptions(Map<DOTSetting, Object> settings) {
-        return of(this.pm, this.entities, addOptions(this.settings, settings));
+        return of(this.pm, this.classProperties, this.entities, addOptions(this.settings, settings));
     }
 
+    /**
+     * Sets a boolean option.
+     *
+     * @param key   {@link DOTSetting} setting key
+     * @param value {@code boolean}
+     * @return a copied instance of {@link OntVisualizer} with new settings
+     */
     public OntVisualizer withOption(DOTSetting key, boolean value) {
         if (Boolean.class != key.type) {
             throw new IllegalArgumentException("Wrong key: " + key);
         }
-        return of(this.pm, this.entities, addOption(this.settings, key, value));
+        return of(this.pm, this.classProperties, this.entities, addOption(this.settings, key, value));
     }
 
+    /**
+     * Sets a string option.
+     *
+     * @param key   {@link DOTSetting} setting key
+     * @param value {@code String}
+     * @return a copied instance of {@link OntVisualizer} with new settings
+     */
     public OntVisualizer withOption(DOTSetting key, String value) {
         if (String.class != key.type) {
             throw new IllegalArgumentException("Wrong key: " + key);
         }
-        return of(this.pm, this.entities, addOption(this.settings, key, value));
+        return of(this.pm, this.classProperties, this.entities, addOption(this.settings, key, value));
     }
 
     @Override
@@ -101,6 +155,11 @@ public class OntVisualizer implements DOTConfig {
     @Override
     public Set<String> entities() {
         return entities;
+    }
+
+    @Override
+    public ClassPropertyMap classProperties() {
+        return classProperties;
     }
 
     @Override

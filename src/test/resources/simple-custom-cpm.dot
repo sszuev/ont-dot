@@ -1,0 +1,43 @@
+digraph OWL {
+ rankdir="LR";
+ node[shape=plaintext];
+n1[style=filled,fillcolor="green",label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <tr>
+  <td>my:SuperClass</td>
+ </tr>
+ <tr>
+  <td bgcolor="#0079BA">owl:topObjectProperty</td>
+ </tr>
+ <tr>
+  <td bgcolor="#38A14A">owl:topDataProperty</td>
+ </tr>
+ <tr>
+  <td bgcolor="#D17A00">rdfs:comment</td>
+ </tr>
+ <tr>
+  <td bgcolor="#D17A00">rdfs:label</td>
+ </tr>
+</table>
+>
+];n2[style=filled,fillcolor="green",label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <tr>
+  <td>my:SubClass</td>
+ </tr>
+ <tr>
+  <td bgcolor="#0079BA">owl:topObjectProperty</td>
+ </tr>
+ <tr>
+  <td bgcolor="#38A14A">owl:topDataProperty</td>
+ </tr>
+ <tr>
+  <td bgcolor="#D17A00">rdfs:comment</td>
+ </tr>
+ <tr>
+  <td bgcolor="#D17A00">rdfs:label</td>
+ </tr>
+</table>
+>
+];n2->n1[color="green"];
+}

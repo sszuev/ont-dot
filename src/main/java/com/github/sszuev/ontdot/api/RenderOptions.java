@@ -11,7 +11,7 @@ public interface RenderOptions {
      *
      * @param key {@link DOTSetting} the key
      * @return {@code boolean}
-     * @see com.github.sszuev.ontdot.utils.ClassPropertyMap
+     * @see ClassPropertyMap
      */
     boolean getBoolean(DOTSetting key);
 
@@ -27,7 +27,7 @@ public interface RenderOptions {
      * Answers {@code true} if the class-properties belonging table should also be displayed.
      *
      * @return {@code boolean}
-     * @see com.github.sszuev.ontdot.utils.ClassPropertyMap
+     * @see ClassPropertyMap
      */
     default boolean displayClassPropertiesMap() {
         return getBoolean(DOTSetting.BOOLEAN_CLASS_PROPERTIES_MAP);

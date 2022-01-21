@@ -38,9 +38,13 @@ public class EntitiesDOTRendererTest {
     }
 
     public static String writeStr(OntModel m, Set<String> entities) {
+        return writeStr(m, OntVisualizer.create()
+                .withOption(DOTSetting.BOOLEAN_CLASS_PROPERTIES_MAP, false), entities);
+    }
+
+    public static String writeStr(OntModel m, OntVisualizer viz, Set<String> entities) {
         StringWriter sw = new StringWriter();
-        new EntitiesDOTRenderer(m, OntVisualizer.create()
-                .withOption(DOTSetting.BOOLEAN_CLASS_PROPERTIES_MAP, false), entities, sw).render(m);
+        new EntitiesDOTRenderer(m, viz.classProperties(), viz, entities, sw).render(m);
         return sw.toString();
     }
 }
