@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Created by @ssz on 15.01.2022.
  */
-public class EntitiesDOTRendererTest {
+public class EntitiesDOTWriterTest {
 
     @Test
     public void testFilteredPizza() {
@@ -44,7 +44,7 @@ public class EntitiesDOTRendererTest {
 
     public static String writeStr(OntModel m, OntVisualizer viz, Set<String> entities) {
         StringWriter sw = new StringWriter();
-        new EntitiesDOTRenderer(m, viz.classProperties(), viz.literalRenderer(), viz, entities, sw).render(m);
+        new EntitiesDOTWriter(m, viz.classProperties(), viz.literalRenderer(), viz, entities, sw).write(m);
         return sw.toString();
     }
 }

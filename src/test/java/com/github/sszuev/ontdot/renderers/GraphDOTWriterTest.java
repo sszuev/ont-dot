@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by @ssz on 10.01.2022.
  */
-public class GraphDOTRendererTest {
+public class GraphDOTWriterTest {
 
     @Test
     public void testSimpleSubClassOfDataMaxCardinality() {
@@ -96,7 +96,7 @@ public class GraphDOTRendererTest {
 
     public static String writeStr(OntModel m, OntVisualizer viz) {
         StringWriter sw = new StringWriter();
-        new GraphDOTRenderer(m, viz.classProperties(), viz.literalRenderer(), sw, viz).render(m);
+        new GraphDOTWriter(m, viz.classProperties(), viz.literalRenderer(), sw, viz).write(m);
         return sw.toString();
     }
 }

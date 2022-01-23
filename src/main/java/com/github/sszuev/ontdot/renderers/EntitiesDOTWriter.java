@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Created by @ssz on 15.01.2022.
  */
-public class EntitiesDOTRenderer extends GraphDOTRenderer {
+public class EntitiesDOTWriter extends GraphDOTWriter {
     private final Set<String> filterEntities;
 
     private final Set<OntClass.Named> visitedClasses = new HashSet<>();
@@ -25,17 +25,17 @@ public class EntitiesDOTRenderer extends GraphDOTRenderer {
     private final Set<OntDataProperty> visitedDataProperties = new HashSet<>();
     private final Set<OntAnnotationProperty> visitedAnnotationProperties = new HashSet<>();
 
-    public EntitiesDOTRenderer(PrefixMapping pm,
-                               ClassPropertyMap classProperties,
-                               LiteralRenderer literalRenderer,
-                               DOTOptions config,
-                               Set<String> filterEntities, Writer wr) {
+    public EntitiesDOTWriter(PrefixMapping pm,
+                             ClassPropertyMap classProperties,
+                             LiteralRenderer literalRenderer,
+                             DOTOptions config,
+                             Set<String> filterEntities, Writer wr) {
         super(pm, classProperties, literalRenderer, wr, config);
         this.filterEntities = Objects.requireNonNull(filterEntities);
     }
 
     @Override
-    public void render(OntModel ont) {
+    public void write(OntModel ont) {
         reset();
         beginDocument();
 

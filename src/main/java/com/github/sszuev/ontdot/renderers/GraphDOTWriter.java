@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
  * @see <a href='https://www.w3.org/TR/owl2-quick-reference/'>A Quick Guide</a>
  * @see <a href='https://www.w3.org/TR/owl2-syntax/'>OWL 2 Web Ontology Language Structural Specification and Functional-Style Syntax (Second Edition)</a>
  */
-public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GraphDOTRenderer.class);
+public class GraphDOTWriter extends BaseDOTRenderer implements DOTWriter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphDOTWriter.class);
 
     protected final PrefixMapping pm;
     protected final DOTOptions config;
@@ -40,7 +40,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     private final AtomicLong nodeCounter = new AtomicLong();
     private final Map<Node, Long> nodeIds = new HashMap<>();
 
-    public GraphDOTRenderer(PrefixMapping pm, ClassPropertyMap cpm, LiteralRenderer lr, Writer wr, DOTOptions options) {
+    public GraphDOTWriter(PrefixMapping pm, ClassPropertyMap cpm, LiteralRenderer lr, Writer wr, DOTOptions options) {
         super(wr);
         this.pm = Objects.requireNonNull(pm);
         this.classProperties = Objects.requireNonNull(cpm);
@@ -49,7 +49,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     }
 
     @Override
-    public void render(OntModel ont) {
+    public void write(OntModel ont) {
         beginDocument();
 
         ont.classes().forEach(this::renderClass);

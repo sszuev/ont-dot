@@ -6,6 +6,7 @@ import com.github.owlcs.ontapi.Ontology;
 import com.github.owlcs.ontapi.OntologyManager;
 import com.github.owlcs.ontapi.jena.model.OntModel;
 import com.github.sszuev.ontdot.api.OntVisualizer;
+import com.github.sszuev.ontdot.renderers.DOTWriter;
 import org.semanticweb.owlapi.io.FileDocumentSource;
 import org.semanticweb.owlapi.io.OWLOntologyDocumentSource;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -58,8 +59,8 @@ public class App {
                     System.out.println(uri);
                 }
             } else {
-                try (Writer writer = openWriter(cli.target())) {
-                    visualizer.write(ont, writer);
+                try (DOTWriter writer = visualizer.newDOTWriter(openWriter(cli.target()))) {
+                    writer.write(ont);
                 }
             }
         }

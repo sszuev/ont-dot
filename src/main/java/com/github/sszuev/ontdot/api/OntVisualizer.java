@@ -2,7 +2,8 @@ package com.github.sszuev.ontdot.api;
 
 import com.github.owlcs.ontapi.jena.OntModelFactory;
 import com.github.owlcs.ontapi.jena.model.OntModel;
-import com.github.sszuev.ontdot.renderers.DOTRendererFactory;
+import com.github.sszuev.ontdot.renderers.DOTWriter;
+import com.github.sszuev.ontdot.renderers.DOTWriterFactory;
 import com.github.sszuev.ontdot.utils.ClassPropertyMapImpl;
 import com.github.sszuev.ontdot.utils.LiteralRendererImpl;
 import org.apache.jena.shared.PrefixMapping;
@@ -208,18 +209,19 @@ public class OntVisualizer implements DOTConfig {
      */
     public String draw(OntModel model) {
         StringWriter sw = new StringWriter();
-        write(model, sw);
+        newDOTWriter(sw).write(model);
         return sw.toString();
     }
 
     /**
-     * Draws the specified {@link OntModel OWL Graph} to the destination represented by {@link Writer}.
+     * Creates a {@link DOTWriter} that wraps the specified {@link Writer}.
+     * Note that the callers themselves are responsible for closing it.
      *
-     * @param model  {@link OntModel} to write, not {@code null}
      * @param writer {@link Writer}, not {@code null}
+     * @return {@link DOTWriter}
      */
-    public void write(OntModel model, Writer writer) {
-        DOTRendererFactory.create(this, writer).render(model);
+    public DOTWriter newDOTWriter(Writer writer) {
+        return DOTWriterFactory.create(this, writer);
     }
 
 }

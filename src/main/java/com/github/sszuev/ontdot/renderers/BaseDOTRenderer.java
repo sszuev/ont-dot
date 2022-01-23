@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * Created by @ssz on 15.01.2022.
  */
-abstract class BaseDOTRenderer {
+abstract class BaseDOTRenderer implements AutoCloseable {
 
     protected final Writer wr;
 
@@ -138,5 +138,10 @@ abstract class BaseDOTRenderer {
         beginTag("tr", tab);
         writeTextCell(txt, tab + 1, backgroundColor);
         endTag("tr", tab);
+    }
+
+    @Override
+    public void close() throws Exception {
+        wr.close();
     }
 }
