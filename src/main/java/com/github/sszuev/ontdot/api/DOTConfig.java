@@ -9,7 +9,7 @@ import java.util.Set;
  * <p>
  * Created by @ssz on 14.01.2022.
  */
-public interface DOTConfig extends RenderOptions {
+public interface DOTConfig extends DOTOptions {
 
     /**
      * Returns prefix map for using while rendering.
@@ -32,4 +32,12 @@ public interface DOTConfig extends RenderOptions {
      * @return {@link ClassPropertyMap}
      */
     ClassPropertyMap classProperties();
+
+    /**
+     * Returns a literal-renderer,
+     * that is a facility to represent {@link org.apache.jena.rdf.model.Literal}s as {@code String}s in DOT.
+     *
+     * @return {@link LiteralRenderer}
+     */
+    LiteralRenderer literalRenderer();
 }

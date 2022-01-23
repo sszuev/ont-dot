@@ -69,13 +69,34 @@ public class GraphDOTRendererTest {
         Assertions.assertEquals(expected, res);
     }
 
+    @Test
+    public void testCustomLiteralRenderer() {
+        String expected = ResourceUtils.getResource("/simple-custom-lr.dot");
+
+        String ns = "http://x#";
+        OntModel m = OntModelFactory.createModel().setNsPrefixes(OntModelFactory.STANDARD).setNsPrefix("my", ns);
+        m.createOntClass(ns + "Clazz")
+                .addEquivalentClass(m.createDataHasValue(m.createDataProperty(ns + "dataProperty"),
+                        m.createTypedLiteral(42)));
+
+        String res = writeStr(m, OntVisualizer.create()
+                .withLiteralRenderer((value, config, pm) -> {
+                    if (value.getInt() == 42)
+                        return "Unknown";
+                    throw new AssertionError();
+                })
+                .withOption(DOTSetting.STRING_CLASS_COLOR, "gray"));
+
+        Assertions.assertEquals(expected, res);
+    }
+
     public static boolean containsLink(String dot, String left, String right) {
         return dot.contains(left + "->" + right);
     }
 
-    public static String writeStr(OntModel m, OntVisualizer conf) {
+    public static String writeStr(OntModel m, OntVisualizer viz) {
         StringWriter sw = new StringWriter();
-        new GraphDOTRenderer(m, conf.classProperties(), conf, sw).render(m);
+        new GraphDOTRenderer(m, viz.classProperties(), viz.literalRenderer(), sw, viz).render(m);
         return sw.toString();
     }
 }

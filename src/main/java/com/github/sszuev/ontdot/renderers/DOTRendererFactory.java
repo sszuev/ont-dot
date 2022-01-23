@@ -12,14 +12,14 @@ public class DOTRendererFactory {
     /**
      * Creates a {@link DOTRenderer} to write into specified {@link Writer}.
      *
-     * @param config {@link DOTConfig}, not {@code null}
-     * @param wr     {@link Writer}
+     * @param conf {@link DOTConfig}, not {@code null}
+     * @param wr   {@link Writer}
      * @return {@link DOTRenderer}
      */
-    public static DOTRenderer create(DOTConfig config, Writer wr) {
-        if (config.entities().isEmpty()) {
-            return new GraphDOTRenderer(config.prefixes(), config.classProperties(), config, wr);
+    public static DOTRenderer create(DOTConfig conf, Writer wr) {
+        if (conf.entities().isEmpty()) {
+            return new GraphDOTRenderer(conf.prefixes(), conf.classProperties(), conf.literalRenderer(), wr, conf);
         }
-        return new EntitiesDOTRenderer(config.prefixes(), config.classProperties(), config, config.entities(), wr);
+        return new EntitiesDOTRenderer(conf.prefixes(), conf.classProperties(), conf.literalRenderer(), conf, conf.entities(), wr);
     }
 }

@@ -2,9 +2,9 @@ package com.github.sszuev.ontdot.renderers;
 
 import com.github.owlcs.ontapi.jena.model.*;
 import com.github.owlcs.ontapi.jena.utils.OntModels;
-import com.github.owlcs.ontapi.jena.vocabulary.XSD;
 import com.github.sszuev.ontdot.api.ClassPropertyMap;
-import com.github.sszuev.ontdot.api.RenderOptions;
+import com.github.sszuev.ontdot.api.DOTOptions;
+import com.github.sszuev.ontdot.api.LiteralRenderer;
 import com.github.sszuev.ontdot.utils.ModelUtils;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Literal;
@@ -25,21 +25,26 @@ import java.util.stream.Collectors;
 
 /**
  * Created by @ssz on 09.01.2022.
+ *
+ * @see <a href='https://www.w3.org/TR/owl2-quick-reference/'>A Quick Guide</a>
+ * @see <a href='https://www.w3.org/TR/owl2-syntax/'>OWL 2 Web Ontology Language Structural Specification and Functional-Style Syntax (Second Edition)</a>
  */
 public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphDOTRenderer.class);
 
     protected final PrefixMapping pm;
-    protected final RenderOptions config;
+    protected final DOTOptions config;
     protected final ClassPropertyMap classProperties;
+    protected final LiteralRenderer literalRenderer;
 
     private final AtomicLong nodeCounter = new AtomicLong();
     private final Map<Node, Long> nodeIds = new HashMap<>();
 
-    public GraphDOTRenderer(PrefixMapping pm, ClassPropertyMap cpm, RenderOptions options, Writer wr) {
+    public GraphDOTRenderer(PrefixMapping pm, ClassPropertyMap cpm, LiteralRenderer lr, Writer wr, DOTOptions options) {
         super(wr);
         this.pm = Objects.requireNonNull(pm);
         this.classProperties = Objects.requireNonNull(cpm);
+        this.literalRenderer = Objects.requireNonNull(lr);
         this.config = Objects.requireNonNull(options);
     }
 
@@ -281,7 +286,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         write(" bgcolor=");
         writeDoubleQuotedText(config.literalColor());
         write(">");
-        write(ModelUtils.print(node, true, pm));
+        write(literalRenderer.print(node, config, pm));
         endTag("td", 0);
     }
 
@@ -290,7 +295,7 @@ public class GraphDOTRenderer extends BaseDOTRenderer implements DOTRenderer {
         write(" bgcolor=");
         writeDoubleQuotedText(config.literalColor());
         write(">");
-        write(ModelUtils.printLiteral(String.valueOf(nonNegativeInt), false, pm, XSD.nonNegativeInteger.getURI(), null));
+        write(literalRenderer.printNonNegativeInteger(nonNegativeInt, config, pm));
         endTag("td", 0);
     }
 

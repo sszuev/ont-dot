@@ -4,6 +4,7 @@ import com.github.owlcs.ontapi.jena.OntModelFactory;
 import com.github.owlcs.ontapi.jena.model.OntModel;
 import com.github.sszuev.ontdot.renderers.DOTRendererFactory;
 import com.github.sszuev.ontdot.utils.ClassPropertyMapImpl;
+import com.github.sszuev.ontdot.utils.LiteralRendererImpl;
 import org.apache.jena.shared.PrefixMapping;
 
 import java.io.StringWriter;
@@ -24,12 +25,18 @@ public class OntVisualizer implements DOTConfig {
     private final Set<String> entities;
     private final Map<DOTSetting, Object> settings;
     private final ClassPropertyMap classProperties;
+    private final LiteralRenderer literalRenderer;
 
-    protected OntVisualizer(PrefixMapping pm, ClassPropertyMap cpm, Map<DOTSetting, Object> conf, Set<String> entities) {
+    protected OntVisualizer(PrefixMapping pm,
+                            ClassPropertyMap cpm,
+                            LiteralRenderer lr,
+                            Map<DOTSetting, Object> conf,
+                            Set<String> entities) {
         this.pm = Objects.requireNonNull(pm);
         this.entities = Objects.requireNonNull(entities);
         this.settings = Objects.requireNonNull(conf);
         this.classProperties = Objects.requireNonNull(cpm);
+        this.literalRenderer = Objects.requireNonNull(lr);
     }
 
     /**
@@ -38,14 +45,15 @@ public class OntVisualizer implements DOTConfig {
      * @return {@link OntVisualizer}
      */
     public static OntVisualizer create() {
-        return of(OntModelFactory.STANDARD, new ClassPropertyMapImpl(), Set.of(), Map.of());
+        return of(OntModelFactory.STANDARD, new ClassPropertyMapImpl(), new LiteralRendererImpl(), Set.of(), Map.of());
     }
 
     protected static OntVisualizer of(PrefixMapping pm,
                                       ClassPropertyMap cpm,
+                                      LiteralRenderer lr,
                                       Set<String> entities,
                                       Map<DOTSetting, Object> settings) {
-        return new OntVisualizer(pm, cpm, settings, entities);
+        return new OntVisualizer(pm, cpm, lr, settings, entities);
     }
 
     protected static Set<String> copy(Collection<String> entities) {
@@ -84,7 +92,7 @@ public class OntVisualizer implements DOTConfig {
      * @return a copied instance of {@link OntVisualizer} with new settings
      */
     public OntVisualizer prefixes(PrefixMapping pm) {
-        return of(copy(pm), this.classProperties, this.entities, this.settings);
+        return of(copy(pm), this.classProperties, this.literalRenderer, this.entities, this.settings);
     }
 
     /**
@@ -94,7 +102,7 @@ public class OntVisualizer implements DOTConfig {
      * @return a copied instance of {@link OntVisualizer} with new settings
      */
     public OntVisualizer entities(Collection<String> entities) {
-        return of(this.pm, this.classProperties, copy(entities), this.settings);
+        return of(this.pm, this.classProperties, this.literalRenderer, copy(entities), this.settings);
     }
 
     /**
@@ -105,8 +113,18 @@ public class OntVisualizer implements DOTConfig {
      * @see DOTSetting#BOOLEAN_CLASS_PROPERTIES_MAP
      */
     public OntVisualizer withClassProperties(ClassPropertyMap cpm) {
-        return of(this.pm, Objects.requireNonNull(cpm), this.entities,
+        return of(this.pm, Objects.requireNonNull(cpm), this.literalRenderer, this.entities,
                 addOption(this.settings, DOTSetting.BOOLEAN_CLASS_PROPERTIES_MAP, true));
+    }
+
+    /**
+     * Sets the specified literal-renderer helper.
+     *
+     * @param literalRenderer {@link LiteralRenderer}, not {@code null}
+     * @return a copied instance of {@link OntVisualizer} with new settings
+     */
+    public OntVisualizer withLiteralRenderer(LiteralRenderer literalRenderer) {
+        return of(this.pm, this.classProperties, Objects.requireNonNull(literalRenderer), this.entities, this.settings);
     }
 
     /**
@@ -116,7 +134,7 @@ public class OntVisualizer implements DOTConfig {
      * @return a copied instance of {@link OntVisualizer} with new settings
      */
     public OntVisualizer withOptions(Map<DOTSetting, Object> settings) {
-        return of(this.pm, this.classProperties, this.entities, addOptions(this.settings, settings));
+        return of(this.pm, this.classProperties, this.literalRenderer, this.entities, addOptions(this.settings, settings));
     }
 
     /**
@@ -130,7 +148,7 @@ public class OntVisualizer implements DOTConfig {
         if (Boolean.class != key.type) {
             throw new IllegalArgumentException("Wrong key: " + key);
         }
-        return of(this.pm, this.classProperties, this.entities, addOption(this.settings, key, value));
+        return of(this.pm, this.classProperties, this.literalRenderer, this.entities, addOption(this.settings, key, value));
     }
 
     /**
@@ -144,7 +162,7 @@ public class OntVisualizer implements DOTConfig {
         if (String.class != key.type) {
             throw new IllegalArgumentException("Wrong key: " + key);
         }
-        return of(this.pm, this.classProperties, this.entities, addOption(this.settings, key, value));
+        return of(this.pm, this.classProperties, this.literalRenderer, this.entities, addOption(this.settings, key, value));
     }
 
     @Override
@@ -160,6 +178,11 @@ public class OntVisualizer implements DOTConfig {
     @Override
     public ClassPropertyMap classProperties() {
         return classProperties;
+    }
+
+    @Override
+    public LiteralRenderer literalRenderer() {
+        return literalRenderer;
     }
 
     @Override

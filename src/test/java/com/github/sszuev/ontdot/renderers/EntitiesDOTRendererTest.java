@@ -44,7 +44,7 @@ public class EntitiesDOTRendererTest {
 
     public static String writeStr(OntModel m, OntVisualizer viz, Set<String> entities) {
         StringWriter sw = new StringWriter();
-        new EntitiesDOTRenderer(m, viz.classProperties(), viz, entities, sw).render(m);
+        new EntitiesDOTRenderer(m, viz.classProperties(), viz.literalRenderer(), viz, entities, sw).render(m);
         return sw.toString();
     }
 }

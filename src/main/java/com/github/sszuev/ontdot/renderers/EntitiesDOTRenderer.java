@@ -2,7 +2,8 @@ package com.github.sszuev.ontdot.renderers;
 
 import com.github.owlcs.ontapi.jena.model.*;
 import com.github.sszuev.ontdot.api.ClassPropertyMap;
-import com.github.sszuev.ontdot.api.RenderOptions;
+import com.github.sszuev.ontdot.api.DOTOptions;
+import com.github.sszuev.ontdot.api.LiteralRenderer;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
 
@@ -26,9 +27,10 @@ public class EntitiesDOTRenderer extends GraphDOTRenderer {
 
     public EntitiesDOTRenderer(PrefixMapping pm,
                                ClassPropertyMap classProperties,
-                               RenderOptions config,
+                               LiteralRenderer literalRenderer,
+                               DOTOptions config,
                                Set<String> filterEntities, Writer wr) {
-        super(pm, classProperties, config, wr);
+        super(pm, classProperties, literalRenderer, wr, config);
         this.filterEntities = Objects.requireNonNull(filterEntities);
     }
 
