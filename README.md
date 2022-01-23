@@ -35,12 +35,13 @@ usage: -i <path-to-input-rdf-file> [-if <format>] [-o <output-file-dot>]|[-b][-v
  -v,--verbose               To print progress messages and logs to console.
  -e,--entities <arg>        A list of entities to filter, full or short (prefixed) IRIs, dot as separator,
                             example for pizza-ontology: '-e :Veneziana,:Germany' 
- -B <arg>                   To options to control rendering, format is -Bkey=value,e.g.
+ -B <arg>                   Options to control rendering, format is -Bkey=value,e.g.
                             '-BclassPropertiesMap=true' will turn on displaying class-properties map. Available
-                            options: classPropertiesMap, classColor, datatypeColor, individualColor,
-                            objectPropertyColor, dataPropertyColor, annotationPropertyColor, literalColor,
-                            classExpressionColor, componentRestrictionColor, componentsClassExpressionColor,
-                            complementOfClassExpressionColor
+                            options: classPropertiesMap, entityAnnotations, classColor, datatypeColor,
+                            individualColor, objectPropertyColor, dataPropertyColor, annotationPropertyColor,
+                            literalColor, classExpressionColor, componentRestrictionColor,
+                            componentsClassExpressionColor, complementOfClassExpressionColor, literalRowLength,
+                            literalRowLength
 ```
 
 ##### Requirements:

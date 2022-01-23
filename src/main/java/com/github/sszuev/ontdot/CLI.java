@@ -112,6 +112,8 @@ class CLI {
             String value = opts[i + 1];
             if (key.type() == Boolean.class) {
                 res.put(key, Boolean.parseBoolean(value));
+            } else if (key.type() == Integer.class) {
+                res.put(key, Integer.parseInt(value));
             } else {
                 res.put(key, value);
             }
@@ -169,7 +171,7 @@ class CLI {
                         .build())
                 .addOption(Option.builder("B")
                         .numberOfArgs(DOTSetting.values().length).valueSeparator('=')
-                        .desc("To options to control rendering, format is -Bkey=value," +
+                        .desc("Options to control rendering, format is -Bkey=value," +
                                 "e.g. '-BclassPropertiesMap=true' will turn on displaying class-properties map. " +
                                 "Available options: " + availableSettings())
                         .required(false)
