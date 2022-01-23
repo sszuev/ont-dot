@@ -16,10 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -171,10 +168,14 @@ public class GraphDOTWriter extends BaseDOTRenderer implements DOTWriter {
                     .forEach(p -> writeSingleCellRow(uri(p), 1, config.objectPropertyColor()));
             properties.stream().filter(x -> x.canAs(OntDataProperty.class))
                     .forEach(p -> writeSingleCellRow(uri(p), 1, config.dataPropertyColor()));
-            properties.stream().filter(x -> x.canAs(OntAnnotationProperty.class))
-                    .forEach(p -> writeSingleCellRow(uri(p), 1, config.annotationPropertyColor()));
+            if (!config.displayEntityAnnotations()) {
+                properties.stream().filter(x -> x.canAs(OntAnnotationProperty.class))
+                        .forEach(p -> writeSingleCellRow(uri(p), 1, config.annotationPropertyColor()));
+            }
         }
-
+        if (config.displayEntityAnnotations()) {
+            writeAnnotationsRow(clazz);
+        }
         endEntityTable();
     }
 
@@ -205,6 +206,9 @@ public class GraphDOTWriter extends BaseDOTRenderer implements DOTWriter {
         writeTextCell(uri(entity), 2);
         endTag("tr", 1);
 
+        if (config.displayEntityAnnotations()) {
+            writeAnnotationsRow(entity);
+        }
         endEntityTable();
     }
 
@@ -225,6 +229,30 @@ public class GraphDOTWriter extends BaseDOTRenderer implements DOTWriter {
         writeNewLine();
         endLinkDetails();
         writeSemicolon();
+    }
+
+    protected void writeAnnotationsRow(OntEntity entity) {
+        List<OntStatement> annotations = entity.annotations().collect(Collectors.toList());
+        if (annotations.isEmpty()) {
+            return;
+        }
+        beginTag("tr", 1);
+        beginTag("td", 2);
+        writeAnnotationsTable(annotations, 3);
+        endTag("td", 2);
+        endTag("tr", 1);
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    protected void writeAnnotationsTable(Collection<OntStatement> annotations, int tab) {
+        beginTable(tab);
+        for (OntStatement a : annotations) {
+            beginTag("tr", tab + 1);
+            writeTextCell(uri(a.getPredicate()), tab + 2);
+            writeNodeCell(a.getObject(), tab + 2);
+            endTag("tr", tab + 1);
+        }
+        endTable(tab);
     }
 
     protected void writeCE(OntClass ce) {

@@ -1,0 +1,47 @@
+digraph OWL {
+ rankdir="LR";
+ node[shape=plaintext];
+n1[style=filled,fillcolor="red2",label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <tr>
+  <td>my:p</td>
+ </tr>
+ <tr>
+  <td>
+   <table border='0' cellborder='1' cellspacing='0'>
+    <tr>
+     <td>my:a</td>
+     <td bgcolor="gray">42^^xsd:int</td>
+    </tr>
+    <tr>
+     <td>rdfs:label</td>
+     <td bgcolor="gray">"TheObjectProperty"</td>
+    </tr>
+    <tr>
+     <td>rdfs:comment</td>
+     <td bgcolor="gray">"The comment."</td>
+    </tr>
+   </table>
+  </td>
+ </tr>
+</table>
+>
+];n2[style=filled,fillcolor="yellow2",label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <tr>
+  <td>my:a</td>
+ </tr>
+ <tr>
+  <td>
+   <table border='0' cellborder='1' cellspacing='0'>
+    <tr>
+     <td>rdfs:label</td>
+     <td bgcolor="gray">"TheAnnotationProperty"</td>
+    </tr>
+   </table>
+  </td>
+ </tr>
+</table>
+>
+];
+}

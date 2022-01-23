@@ -5,6 +5,7 @@ import com.github.owlcs.ontapi.jena.vocabulary.XSD;
 import com.github.sszuev.ontdot.api.DOTSetting;
 import com.github.sszuev.ontdot.api.LiteralOptions;
 import com.github.sszuev.ontdot.api.LiteralRenderer;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.shared.PrefixMapping;
 
@@ -58,7 +59,7 @@ public class LiteralRendererImpl implements LiteralRenderer {
         if (datatype == null) {
             return true;
         }
-        if (value.getLanguage() != null) {
+        if (!StringUtils.isEmpty(value.getLanguage())) {
             return true;
         }
         return XSD.xstring.getURI().equals(datatype) || RDF.PlainLiteral.getURI().equals(datatype);

@@ -16,6 +16,15 @@ public interface DOTOptions extends RenderOptions, LiteralOptions {
         return getBoolean(DOTSetting.BOOLEAN_CLASS_PROPERTIES_MAP);
     }
 
+    /**
+     * Answers {@code true} if the entity annotations table should also be displayed.
+     *
+     * @return {@code boolean}
+     */
+    default boolean displayEntityAnnotations() {
+        return getBoolean(DOTSetting.BOOLEAN_ENTITY_ANNOTATIONS);
+    }
+
     default String classColor() {
         return getString(DOTSetting.STRING_CLASS_COLOR);
     }

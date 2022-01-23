@@ -4,13 +4,11 @@ package com.github.sszuev.ontdot.api;
  * Collection of available settings.
  */
 public enum DOTSetting {
-    /**
-     * if true class-properties belonging table should also be displayed
-     */
+    // to display class-properties belonging table
     BOOLEAN_CLASS_PROPERTIES_MAP("classPropertiesMap", Boolean.class, false),
-    /**
-     * colors
-     */
+    // to display entity annotations
+    BOOLEAN_ENTITY_ANNOTATIONS("entityAnnotations", Boolean.class, false),
+    // colors
     STRING_CLASS_COLOR("classColor", String.class, "#CFA500"),
     STRING_DATATYPE_COLOR("datatypeColor", String.class, "#AD3B45"),
     STRING_INDIVIDUAL_COLOR("individualColor", String.class, "#874B82"),

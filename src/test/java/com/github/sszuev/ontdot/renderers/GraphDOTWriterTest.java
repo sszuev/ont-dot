@@ -83,7 +83,6 @@ public class GraphDOTWriterTest {
         Assertions.assertEquals(expected, res);
     }
 
-
     @Test
     public void testCustomLiteralRenderer() {
         String expected = ResourceUtils.getResource("/simple-custom-lr.dot");
@@ -101,6 +100,26 @@ public class GraphDOTWriterTest {
                     throw new AssertionError();
                 })
                 .withOption(DOTSetting.STRING_CLASS_COLOR, "gray"));
+
+        Assertions.assertEquals(expected, res);
+    }
+
+    @Test
+    public void testDisplayEntityAnnotations() {
+        String expected = ResourceUtils.getResource("/simple-entity-annotations.dot");
+
+        String ns = "http://x#";
+        OntModel m = OntModelFactory.createModel().setNsPrefixes(OntModelFactory.STANDARD).setNsPrefix("my", ns);
+        m.createObjectProperty(ns + "p")
+                .addComment("The comment.")
+                .addLabel("TheObjectProperty")
+                .addAnnotation(m.createAnnotationProperty(ns + "a")
+                        .addLabel("TheAnnotationProperty"), m.createTypedLiteral(42));
+
+        String res = writeStr(m, OntVisualizer.create()
+                .withOption(DOTSetting.BOOLEAN_ENTITY_ANNOTATIONS, true)
+                .withOption(DOTSetting.STRING_ANNOTATION_PROPERTY_COLOR, "yellow2")
+                .withOption(DOTSetting.STRING_OBJECT_PROPERTY_COLOR, "red2"));
 
         Assertions.assertEquals(expected, res);
     }
