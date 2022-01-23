@@ -1,4 +1,4 @@
-package com.github.sszuev.ontdot.utils;
+package com.github.sszuev.tests.utils;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

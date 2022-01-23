@@ -5,7 +5,7 @@ import com.github.owlcs.ontapi.jena.model.OntClass;
 import com.github.owlcs.ontapi.jena.model.OntModel;
 import com.github.sszuev.ontdot.api.DOTSetting;
 import com.github.sszuev.ontdot.api.OntVisualizer;
-import com.github.sszuev.ontdot.utils.ResourceUtils;
+import com.github.sszuev.tests.utils.ResourceUtils;
 import org.apache.jena.rdf.model.Property;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package com.github.sszuev.ontdot.utils;
+package com.github.sszuev.tests.utils;
 
 import com.github.owlcs.ontapi.OWLAdapter;
 import com.github.owlcs.ontapi.OntFormat;
