@@ -196,6 +196,11 @@ public class OntVisualizer implements DOTConfig {
         return getSetting(key);
     }
 
+    @Override
+    public Integer getInteger(DOTSetting key) {
+        return getSetting(key);
+    }
+
     @SuppressWarnings({"unchecked", "SameParameterValue"})
     protected <X> X getSetting(DOTSetting key) {
         return (X) settings.getOrDefault(key, key.defaultValue);

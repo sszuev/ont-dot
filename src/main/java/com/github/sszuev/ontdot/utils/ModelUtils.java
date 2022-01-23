@@ -3,11 +3,8 @@ package com.github.sszuev.ontdot.utils;
 import com.github.owlcs.ontapi.jena.model.*;
 import com.github.owlcs.ontapi.jena.utils.Iter;
 import com.github.owlcs.ontapi.jena.vocabulary.OWL;
-import com.github.owlcs.ontapi.jena.vocabulary.XSD;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDFS;
 
@@ -104,34 +101,4 @@ public class ModelUtils {
         }
     }
 
-    /**
-     * Represents {@link Literal} as a {@code String}.
-     *
-     * @param node    {@link Literal}
-     * @param quoting {@code boolean} (to use quoting or not)
-     * @param pm      {@link PrefixMapping}
-     * @return {@code String}
-     */
-    public static String print(Literal node, boolean quoting, PrefixMapping pm) {
-        return printLiteral(node.getLexicalForm(), quoting, pm, node.getDatatypeURI(), node.getLanguage());
-    }
-
-    public static String printLiteral(String text, boolean quoting, PrefixMapping pm, String type, String lang) {
-        StringBuilder b = new StringBuilder();
-        if (quoting) {
-            b.append('"');
-        }
-        b.append(text.replace("\"", "\\\""));
-        if (quoting) {
-            b.append('"');
-        }
-        if (lang != null && !lang.equals("")) {
-            b.append("@").append(lang);
-        } else if (type != null) {
-            if (!XSD.xstring.getURI().equals(type)) {
-                b.append("^^").append(pm.shortForm(type));
-            }
-        }
-        return b.toString();
-    }
 }

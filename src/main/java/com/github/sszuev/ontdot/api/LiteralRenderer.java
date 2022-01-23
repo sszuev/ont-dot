@@ -16,21 +16,21 @@ public interface LiteralRenderer {
      * Represents the specified {@link Literal} as a {@code String}.
      *
      * @param value  {@link Literal}, not {@code null}
-     * @param config {@link RenderOptions}, settings
+     * @param config {@link LiteralOptions}, settings
      * @param pm     {@link PrefixMapping}
      * @return {@code String}
      */
-    String print(Literal value, RenderOptions config, PrefixMapping pm);
+    String print(Literal value, LiteralOptions config, PrefixMapping pm);
 
     /**
      * Represents {@code value^^xsd:nonNegativeInteger}-literal as a {@code String}.
      *
      * @param value  a non-negative {@code long}
-     * @param config {@link RenderOptions}, settings
+     * @param config {@link LiteralOptions}, settings
      * @param pm     {@link PrefixMapping}
      * @return {@code String}
      */
-    default String printNonNegativeInteger(long value, RenderOptions config, PrefixMapping pm) {
+    default String printNonNegativeInteger(long value, LiteralOptions config, PrefixMapping pm) {
         return print(createNonNegativeInteger(value), config, pm);
     }
 

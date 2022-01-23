@@ -1,0 +1,30 @@
+digraph OWL {
+ rankdir="LR";
+ node[shape=plaintext];
+n1[style=filled,fillcolor="yellow",label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <tr>
+  <td>my:C</td>
+ </tr>
+</table>
+>
+];n2[color="#CCCC00",style=filled,fillcolor="yellow1",label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <th port="header">
+  <td colspan="2" bgcolor="#CCCC00">DataHasValue</td>
+ </th>
+ <tr>
+  <td bgcolor="#38A14A">my:dp</td>
+  <td bgcolor="gray">"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx<br/>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx<br/>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx<br/>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..."</td>
+ </tr>
+</table>
+>
+];n2->n3;n1->n2[color="yellow"];n3[style=filled,fillcolor="#38A14A",label=<
+<table border='0' cellborder='1' cellspacing='0'>
+ <tr>
+  <td>my:dp</td>
+ </tr>
+</table>
+>
+];
+}

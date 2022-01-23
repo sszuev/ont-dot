@@ -4,7 +4,7 @@ package com.github.sszuev.ontdot.api;
  * Contains DOT-render settings.
  * Created by @ssz on 16.01.2022.
  */
-public interface DOTOptions extends RenderOptions {
+public interface DOTOptions extends RenderOptions, LiteralOptions {
 
     /**
      * Answers {@code true} if the class-properties belonging table should also be displayed.

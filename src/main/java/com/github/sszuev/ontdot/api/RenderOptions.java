@@ -24,4 +24,13 @@ public interface RenderOptions {
      */
     String getString(DOTSetting key);
 
+
+    /**
+     * Answers {@code Integer}-value associated with the key.
+     *
+     * @param key {@link DOTSetting} the key
+     * @return {@code Integer}
+     */
+    Integer getInteger(DOTSetting key);
+
 }

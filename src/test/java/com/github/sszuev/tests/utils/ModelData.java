@@ -1,9 +1,6 @@
 package com.github.sszuev.tests.utils;
 
-import com.github.owlcs.ontapi.OWLAdapter;
-import com.github.owlcs.ontapi.OntFormat;
-import com.github.owlcs.ontapi.Ontology;
-import com.github.owlcs.ontapi.OntologyManager;
+import com.github.owlcs.ontapi.*;
 import com.github.owlcs.ontapi.jena.model.OntClass;
 import com.github.owlcs.ontapi.jena.model.OntDataProperty;
 import com.github.owlcs.ontapi.jena.model.OntIndividual;
@@ -209,6 +206,10 @@ public enum ModelData {
 
     public OWLOntology fetch(OWLOntologyManager manager) {
         return fetch(manager, createConfig(manager));
+    }
+
+    public Ontology ont() {
+        return (Ontology) fetch(OntManagers.createManager());
     }
 
     OWLOntology fetch(OWLOntologyManager manager, OWLOntologyLoaderConfiguration conf) {

@@ -70,6 +70,21 @@ public class GraphDOTWriterTest {
     }
 
     @Test
+    public void testDefaultLiteralRenderer() {
+        String expected = ResourceUtils.getResource("/simple-default-lr.dot");
+
+        String ns = "http://x#";
+        OntModel m = OntModelFactory.createModel().setNsPrefixes(OntModelFactory.STANDARD).setNsPrefix("my", ns);
+        m.createOntClass(ns + "C").addSuperClass(m.createDataHasValue(m.createDataProperty(ns + "dp"),
+                m.createLiteral("xxx".repeat(1000))));
+
+        String res = writeStr(m, OntVisualizer.create().withOption(DOTSetting.STRING_CLASS_COLOR, "yellow"));
+
+        Assertions.assertEquals(expected, res);
+    }
+
+
+    @Test
     public void testCustomLiteralRenderer() {
         String expected = ResourceUtils.getResource("/simple-custom-lr.dot");
 

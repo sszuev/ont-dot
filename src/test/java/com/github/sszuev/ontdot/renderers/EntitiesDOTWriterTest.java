@@ -1,7 +1,5 @@
 package com.github.sszuev.ontdot.renderers;
 
-import com.github.owlcs.ontapi.OntManagers;
-import com.github.owlcs.ontapi.Ontology;
 import com.github.owlcs.ontapi.jena.model.OntModel;
 import com.github.sszuev.ontdot.api.DOTSetting;
 import com.github.sszuev.ontdot.api.OntVisualizer;
@@ -20,7 +18,7 @@ public class EntitiesDOTWriterTest {
 
     @Test
     public void testFilteredPizza() {
-        OntModel ont = ((Ontology) ModelData.PIZZA.fetch(OntManagers.createManager())).asGraphModel();
+        OntModel ont = ModelData.PIZZA.ont().asGraphModel();
         Set<String> filter = Set.of(ont.expandPrefix(":Germany"),
                 ":America", "http://www.co-ode.org/ontologies/pizza/pizza.owl#Veneziana");
         String res = writeStr(ont, filter);
@@ -29,7 +27,7 @@ public class EntitiesDOTWriterTest {
 
     @Test
     public void testFilteredKoalaQuokka() {
-        OntModel ont = ((Ontology) ModelData.KOALA.fetch(OntManagers.createManager())).asGraphModel();
+        OntModel ont = ModelData.KOALA.ont().asGraphModel();
         Set<String> filter = Set.of(":Quokka");
         String res = writeStr(ont, filter);
 

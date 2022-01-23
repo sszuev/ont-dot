@@ -9,7 +9,7 @@ import java.util.Set;
  * <p>
  * Created by @ssz on 14.01.2022.
  */
-public interface DOTConfig extends DOTOptions {
+public interface DOTConfig extends DOTOptions, LiteralOptions {
 
     /**
      * Returns prefix map for using while rendering.

@@ -23,6 +23,9 @@ public enum DOTSetting {
     STRING_COMPONENT_RESTRICTION_COLOR("componentRestrictionColor", String.class, "yellow1"),
     STRING_COMPONENTS_CE_COLOR("componentsClassExpressionColor", String.class, "yellow2"),
     STRING_COMPLEMENT_CE_COLOR("complementOfClassExpressionColor", String.class, "yellow3"),
+
+    INT_LITERAL_ROW_LENGTH("literalRowLength", Integer.class, 42),
+    INT_LITERAL_ROWS_NUM("literalRowLength", Integer.class, 4),
     ;
     final String name;
     final Object defaultValue;
