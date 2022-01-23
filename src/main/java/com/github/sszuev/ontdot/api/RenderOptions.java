@@ -24,7 +24,6 @@ public interface RenderOptions {
      */
     String getString(DOTSetting key);
 
-
     /**
      * Answers {@code Integer}-value associated with the key.
      *
@@ -32,5 +31,4 @@ public interface RenderOptions {
      * @return {@code Integer}
      */
     Integer getInteger(DOTSetting key);
-
 }

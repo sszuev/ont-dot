@@ -1,5 +1,6 @@
 package com.github.sszuev.ontdot.renderers;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
@@ -8,7 +9,7 @@ import java.util.Objects;
 /**
  * Created by @ssz on 15.01.2022.
  */
-abstract class BaseDOTRenderer implements AutoCloseable {
+abstract class BaseDOTRenderer implements Closeable {
 
     protected final Writer wr;
 
@@ -141,7 +142,7 @@ abstract class BaseDOTRenderer implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         wr.close();
     }
 }

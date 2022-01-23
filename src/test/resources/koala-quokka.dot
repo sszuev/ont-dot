@@ -15,7 +15,7 @@ n1[style=filled,fillcolor="#CFA500",label=<
  </th>
  <tr>
   <td bgcolor="#38A14A">:isHardWorking</td>
-  <td bgcolor="gray">"true"^^xsd:boolean</td>
+  <td bgcolor="gray">true^^xsd:boolean</td>
  </tr>
 </table>
 >
