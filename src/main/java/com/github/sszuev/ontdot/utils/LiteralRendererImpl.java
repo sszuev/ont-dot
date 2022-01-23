@@ -19,10 +19,11 @@ public class LiteralRendererImpl implements LiteralRenderer {
     @Override
     public String print(Literal value, LiteralOptions config, PrefixMapping pm) {
         String txt = value.getLexicalForm();
-        if (isStringLiteral(value)) {
+        boolean isString = isStringLiteral(value);
+        if (isString) {
             txt = format(txt, config);
         }
-        return printLiteral(txt, true, pm, value.getDatatypeURI(), value.getLanguage());
+        return printLiteral(txt, isString, pm, value.getDatatypeURI(), value.getLanguage());
     }
 
     @Override
@@ -52,12 +53,15 @@ public class LiteralRendererImpl implements LiteralRenderer {
         return res.toString();
     }
 
-    public static boolean isStringLiteral(Literal literal) {
-        String uri = literal.getDatatypeURI();
-        if (uri == null) {
+    public static boolean isStringLiteral(Literal value) {
+        String datatype = value.getDatatypeURI();
+        if (datatype == null) {
             return true;
         }
-        return XSD.xstring.getURI().equals(uri) || RDF.PlainLiteral.getURI().equals(uri);
+        if (value.getLanguage() != null) {
+            return true;
+        }
+        return XSD.xstring.getURI().equals(datatype) || RDF.PlainLiteral.getURI().equals(datatype);
     }
 
     public String format(String txt, LiteralOptions config) {
