@@ -248,7 +248,7 @@ public class GraphDOTWriter extends BaseDOTRenderer implements DOTWriter {
         beginTable(tab);
         for (OntStatement a : annotations) {
             beginTag("tr", tab + 1);
-            writeTextCell(uri(a.getPredicate()), tab + 2);
+            writeTextCell(uri(a.getPredicate()), tab + 2, config.annotationPropertyColor());
             writeNodeCell(a.getObject(), tab + 2);
             endTag("tr", tab + 1);
         }

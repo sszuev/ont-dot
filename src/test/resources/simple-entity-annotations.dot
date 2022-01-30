@@ -10,15 +10,15 @@ n1[style=filled,fillcolor="red2",label=<
   <td>
    <table border='0' cellborder='1' cellspacing='0'>
     <tr>
-     <td>my:a</td>
+     <td bgcolor="yellow2">my:a</td>
      <td bgcolor="gray">42^^xsd:int</td>
     </tr>
     <tr>
-     <td>rdfs:label</td>
+     <td bgcolor="yellow2">rdfs:label</td>
      <td bgcolor="gray">"TheObjectProperty"</td>
     </tr>
     <tr>
-     <td>rdfs:comment</td>
+     <td bgcolor="yellow2">rdfs:comment</td>
      <td bgcolor="gray">"The comment."</td>
     </tr>
    </table>
@@ -35,7 +35,7 @@ n1[style=filled,fillcolor="red2",label=<
   <td>
    <table border='0' cellborder='1' cellspacing='0'>
     <tr>
-     <td>rdfs:label</td>
+     <td bgcolor="yellow2">rdfs:label</td>
      <td bgcolor="gray">"TheAnnotationProperty"</td>
     </tr>
    </table>
