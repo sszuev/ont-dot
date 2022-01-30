@@ -3,6 +3,7 @@ package com.github.sszuev.ontdot;
 import com.github.owlcs.ontapi.OntFormat;
 import com.github.sszuev.ontdot.api.DOTSetting;
 import org.apache.commons.cli.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
  * Created by @ssz on 12.01.2022.
  */
 class CLI {
-    private static final int DEFAULT_WIDTH = (int) (HelpFormatter.DEFAULT_WIDTH * 1.5);
+    private static final int DEFAULT_WIDTH = (int) (HelpFormatter.DEFAULT_WIDTH * 2.5);
     private static final Set<String> HELP_REQUEST = Set.of("/?", "/help", "-help", "--help", "h", "-h", "--h");
 
     private final Path source;
@@ -172,8 +173,8 @@ class CLI {
                 .addOption(Option.builder("B")
                         .numberOfArgs(DOTSetting.values().length).valueSeparator('=')
                         .desc("Options to control rendering, format is -Bkey=value," +
-                                "e.g. '-BclassPropertiesMap=true' will turn on displaying class-properties map. " +
-                                "Available options: " + availableSettings())
+                                "e.g. '-BclassPropertiesMap=true' will turn on displaying class-properties map.\n" +
+                                "Available options:\n" + availableSettings())
                         .required(false)
                         .build())
                 ;
@@ -201,22 +202,24 @@ class CLI {
     private static Option buildHelpOption() {
         return Option.builder("h")
                 .longOpt("help")
-                .desc("Display usage")
+                .desc("Display this usage")
                 .build();
     }
 
     private static String printHelp(Options options) {
         HelpFormatter hf = new HelpFormatter();
+        hf.setOptionComparator(null);
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        hf.printHelp(pw, DEFAULT_WIDTH, cmdLineSyntax(), null, options,
-                hf.getLeftPadding(), hf.getDescPadding(), null);
+
+        hf.printHelp(pw, DEFAULT_WIDTH, cmdLineSyntax(), null, options, hf.getLeftPadding(), hf.getDescPadding(), null);
         pw.flush();
         return sw.toString();
     }
 
     private static String cmdLineSyntax() {
-        return "-i <path-to-input-rdf-file> [-if <format>] [-o <output-file-dot>]|[-b][-v][-u] [-e filterEntities][-Boption-key=option-value]";
+        return "-i <path-to-input-rdf-file> [-if <format>] " +
+                "[-o <output-file-dot>]|[-b][-v][-u] [-e filterEntities][-Boption-key=option-value]";
     }
 
     private static String availableFormats() {
@@ -224,7 +227,14 @@ class CLI {
     }
 
     private static String availableSettings() {
-        return Arrays.stream(DOTSetting.values()).map(DOTSetting::key).collect(Collectors.joining(", "));
+        return Arrays.stream(DOTSetting.values()).map(CLI::printSetting).collect(Collectors.joining("\n"));
+    }
+
+    private static String printSetting(DOTSetting setting) {
+        return String.format("%s%s%s",
+                StringUtils.rightPad("-B" + setting.key(), 36),
+                StringUtils.rightPad("(" + setting.type().getSimpleName().toLowerCase(Locale.ENGLISH) + ")", 9),
+                " -- " + setting.description());
     }
 
     public Path source() {
